@@ -1,0 +1,20 @@
+<div class="pagos-container">
+    <header>
+        <h2>Mis Pagos ({{ cantidadPagos() }})</h2>
+        <button class="btn btn-secondary bg-black-200" (click)="cerrarSesion()">
+            <i class="fi fi-sr-portal-exit"></i>
+            Salir
+        </button>
+    </header>
+
+    <ul>
+        @for (pago of listaPagos(); track pago.id) {
+        <li>
+            ID Firebase: {{ pago.id }} |
+            Concepto: {{ pago.concepto }} |
+            Dia: {{ pago.dia_vencimiento }} |
+            Estado: {{ pago.estado }}
+        </li>
+        }
+    </ul>
+</div>
