@@ -43,13 +43,5 @@ export class PagosListComponent {
     });
   }
 
-  cerrarSesion() {
-    try {
-      this.auth.signOut().then((result) => {
-        this.router.navigateByUrl('/auth');
-      });
-    } catch (error) {
-      console.error('Error al cerrar sesión' + error);
-    }
-  }
+
 }

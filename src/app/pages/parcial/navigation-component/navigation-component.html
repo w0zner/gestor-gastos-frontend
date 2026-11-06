@@ -1,0 +1,60 @@
+<div class="navbar bg-base-100 shadow-sm">
+  <div class="flex-1">
+    <a class="btn btn-ghost text-xl">Gestapp</a>
+  </div>
+  <div class="flex gap-2">
+    <!-- <div class="dropdown dropdown-end">
+      <div tabindex="0" role="button" class="btn btn-ghost btn-circle">
+        <div class="indicator">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"> <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" /> </svg>
+          <span class="badge badge-sm indicator-item">8</span>
+        </div>
+      </div>
+      <div
+        tabindex="0"
+        class="card card-sm dropdown-content bg-base-100 z-1 mt-3 w-52 shadow">
+        <div class="card-body">
+          <span class="text-lg font-bold">8 Items</span>
+          <span class="text-info">Subtotal: $999</span>
+          <div class="card-actions">
+            <button class="btn btn-primary btn-block">View cart</button>
+          </div>
+        </div>
+      </div>
+    </div> -->
+    <div *ngIf="usuario$ | async as usuario" class="flex items-center gap-2 mr-4">
+      <p>Hola, {{ usuario.displayName || usuario.email }}</p>
+    </div>
+    <div class="dropdown dropdown-end mr-4">
+      <div tabindex="0" role="button" class="btn btn-ghost btn-circle avatar">
+        <div class="w-10 rounded-full">
+          <img
+            alt="Tailwind CSS Navbar component"
+            src="data:image/png;base64,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" />
+        </div>
+      </div>
+      <ul
+        tabindex="-1"
+        class="menu menu-sm dropdown-content bg-base-100 rounded-box z-1 mt-3 w-52 p-2 shadow">
+        <li>
+          <a role="button">
+            <i class="fi fi-sr-user-gear"></i>
+            Perfil
+            <!-- <span class="badge">New</span> -->
+          </a>
+        </li>
+<!--     <li><a>Settings</a></li>-->
+         <li>
+          <a role="button" (click)="cerrarSesion()">
+            <i class="fi fi-sr-portal-exit"></i>
+            Salir
+          </a>
+         </li>
+      </ul>
+    </div>
+<!--     <button class="btn btn-neutral btn-sm bg-black-200" (click)="cerrarSesion()">
+            <i class="fi fi-sr-portal-exit"></i>
+            Salir
+        </button> -->
+  </div>
+</div>

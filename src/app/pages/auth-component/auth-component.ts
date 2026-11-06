@@ -17,8 +17,9 @@ export class AuthComponent {
     const provider = new GoogleAuthProvider();
     signInWithPopup(this.auth, provider)
       .then((result) => {
+        console.log('Usuario logueado con éxito', result.user.email);
         console.log("Bienvenido")
-        this.router.navigateByUrl("/pagos")
+        this.router.navigateByUrl("/inicio")
       })
       .catch((error) => console.error('Error al loguear', error));
   }
