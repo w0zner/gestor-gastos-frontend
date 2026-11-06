@@ -1,8 +1,25 @@
-<div class="app-layout">
-  <app-navigation-component></app-navigation-component>
-  <main class="main-content">
-      <router-outlet></router-outlet>
+<!-- Componente de Navegación superior -->
+<app-navigation-component></app-navigation-component>
+
+<!-- Contenedor principal con grid de 12 columnas -->
+<div class="grid grid-cols-12 gap-4 p-4 min-h-[calc(100vh-80px)]">
+
+  <!-- Contenido Principal que cambia con las rutas (Ocupa 8 columnas o 12 en móviles) -->
+  <main class="col-span-12 md:col-span-12 bg-base-100 border border-base-300 p-6 rounded-box shadow-sm">
+    <router-outlet></router-outlet>
   </main>
-  <!-- Componente de Footer -->
+
+  <!-- Opcional: Una barra lateral o panel derecho (Ocupa las 4 columnas restantes) -->
+  <!-- <aside class="col-span-12 md:col-span-4 bg-base-200 p-6 rounded-box">
+    <h3 class="font-bold text-lg mb-2">Panel Lateral</h3>
+    <p class="text-sm opacity-75">Aquí puedes poner un resumen, perfil de usuario o accesos rápidos.</p>
+  </aside> -->
+
 </div>
 
+<!-- Componente o sección de Footer (Ocupa todo el ancho con col-span-12 dentro de su propia fila) -->
+<footer class="footer footer-center p-4 bg-base-300 text-base-content mt-auto">
+  <aside>
+    <p>Copyright © 2026 - Todos los derechos reservados</p>
+  </aside>
+</footer>

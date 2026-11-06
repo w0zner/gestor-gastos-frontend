@@ -1,10 +1,10 @@
 <div class="container">
     <header class="flex justify-content-between align-items-center">
-        <h2>Mis Pagos ({{ cantidadPagos() }})</h2>
-
+        <h4 class="font-bold text-lg mb-2">Mis Pagos <div class="badge badge-ghost badge-outline">{{ cantidadPagos() }}
+            </div>
+        </h4>
     </header>
-
-    <ul>
+    <!--     <ul>
         @for (pago of listaPagos(); track pago.id) {
         <li>
             ID Firebase: {{ pago.id }} |
@@ -13,5 +13,40 @@
             Estado: {{ pago.estado }}
         </li>
         }
-    </ul>
+    </ul> -->
+    <div class="overflow-x-auto">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Id</th>
+                    <th>Concepto</th>
+                    <th>Día</th>
+                    <th>Categoría</th>
+                    <th>Monto Estimado</th>
+                    <th>Estado</th>
+                    <th>Fecha de pago</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!--  <tr>
+                    <th>1</th>
+                    <td>Cy Ganderton</td>
+                    <td>Quality Control Specialist</td>
+                    <td>Blue</td>
+                </tr> -->
+                @for (pago of listaPagos(); track pago.id) {
+                <tr>
+                    <td>{{pago.id}}</td>
+                    <td>{{pago.concepto}}</td>
+                    <td>{{pago.dia_vencimiento}}</td>
+                    <td>{{pago.categoria}}</td>
+                    <td>{{pago.monto_estimado}}</td>
+                    <td>{{pago.estado}}</td>
+                    <td>{{ pago.fecha_pago ? (pago.fecha_pago.toDate() | date:'dd/MM/yyyy') : '-' }}</td>
+                </tr>
+                }
+                <!-- class="bg-base-200" -->
+            </tbody>
+        </table>
+    </div>
 </div>

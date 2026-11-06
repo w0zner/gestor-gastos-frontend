@@ -10,8 +10,19 @@ export class PagosService {
   private firestore = inject(Firestore);
 
   private pagosCollection = collection(this.firestore, 'gastos');
+  private categoriaCollection = collection(this.firestore, 'categorias');
+  private estadoCollection = collection(this.firestore, 'estados');
+
 
   getPagos(): Observable<any[]> {
     return collectionData(this.pagosCollection, { idField: 'id' }) as Observable<any[]>
+  }
+
+  getCategorias(): Observable<any[]> {
+    return collectionData(this.categoriaCollection, { idField: 'id' }) as Observable<any[]>
+  }
+
+  getEstados(): Observable<any[]> {
+    return collectionData(this.estadoCollection, { idField: 'id' }) as Observable<any[]>
   }
 }
