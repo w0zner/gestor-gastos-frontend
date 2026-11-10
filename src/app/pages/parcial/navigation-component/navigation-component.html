@@ -23,7 +23,7 @@
       </div>
     </div> -->
     <div *ngIf="usuario$ | async as usuario" class="flex items-center gap-2 mr-4">
-      <p>Hola, {{ usuario.displayName || usuario.email }}</p>
+      <p>Hola, {{ usuario.email || usuario.displayName }}</p>
     </div>
     <div class="dropdown dropdown-end mr-4">
       <div tabindex="0" role="button" class="btn btn-ghost btn-circle avatar">

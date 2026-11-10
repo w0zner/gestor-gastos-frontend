@@ -1,5 +1,6 @@
 import { AsyncPipe, NgIf } from '@angular/common';
-import { Component, inject } from '@angular/core';
+import { Component, effect, inject } from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
 import { Auth, user } from '@angular/fire/auth';
 import { Router, RouterLink } from '@angular/router';
 
@@ -18,6 +19,13 @@ export class NavigationComponent {
   private auth = inject(Auth);
 
   usuario$ = user(this.auth);
+  //user = toSignal(user(this.auth), { initialValue: null });
+
+  /* constructor() {
+    effect(() => {
+      console.log(this.user());
+    });
+  } */
 
   cerrarSesion() {
     try {
