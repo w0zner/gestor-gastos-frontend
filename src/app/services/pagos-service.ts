@@ -42,6 +42,24 @@ export class PagosService {
     );
   }
 
+
+  getPlantillas(activo: boolean): Observable<any[]> {
+    return user(this.auth).pipe(
+      switchMap(currentUser => {
+        if (!currentUser) return of([]); // Si no hay usuario, lista vacía
+        console.log('Usuario actual en getPlantillas():', currentUser.uid);
+
+        const q = query(
+          collection(this.firestore, `users/${currentUser.uid}/plantillas`),
+          where('activo', '==', activo),
+          //where('anho', '==', anho),
+          orderBy('dia_vencimiento', 'asc')
+        );
+        return collectionData(q, { idField: 'id' });
+      })
+    );
+  }
+
   getPagos(): Observable<any[]> {
     //console.log('Usuario actual:', this.usuario());
     let usuario = 0
@@ -88,51 +106,50 @@ export class PagosService {
   }
 
 
-/* async initializeMonthlyExpenses(targetMonth: string) {
-  const expensesRef = collection(this.firestore, `users/${this.usuario()?.uid}/gastos`);
+  async inicializarMesGastos() {
+    const mesActual = new Date().getMonth() + 1;
+    const expensesRef = collection(this.firestore, `users/${this.usuario()?.uid}/gastos`);
 
-  // 1. Verificar si ya existen gastos fijos generados para este mes (ej. "2026-11")
-  const q = query(
-    expensesRef,
-    where('mes', '==', targetMonth),
-    where('esFijo', '==', true)
-  );
-  const existingSnap = await getDocs(q);
+    // 1. Verificar si ya existen gastos fijos generados para este mes (ej. "2026-11")
+    const q = query(
+      expensesRef,
+      where('mes', '==', mesActual),
+      where('esFijo', '==', true)
+    );
+    const existingSnap = await getDocs(q);
 
-  if (!existingSnap.empty) {
-    console.log('Los gastos fijos de este mes ya fueron inicializados.');
-    return;
+    if (!existingSnap.empty) {
+      console.log('Los gastos fijos de este mes ya fueron inicializados.');
+      return;
+    }
+
+    // 2. Obtener las plantillas activas
+    const templatesRef = collection(this.firestore, `users/${this.usuario()?.uid}/plantillas`);
+    const templatesSnap = await getDocs(query(templatesRef, where('activo', '==', true)));
+
+    if (templatesSnap.empty) return;
+
+    // 3. Crear las instancias usando un batch para eficiencia atómica
+    const batch = writeBatch(this.firestore);
+
+    templatesSnap.forEach(templateDoc => {
+      const template = templateDoc.data();
+      const newExpenseRef = doc(collection(this.firestore, `users/${this.usuario()?.uid}/gastos`));
+
+      batch.set(newExpenseRef, {
+        ...template,
+        mes: mesActual,
+        esFijo: true,
+        createdAt: serverTimestamp()
+      });
+    });
+
+    await batch.commit();
+    console.log('Gastos fijos del mes inicializados con éxito.');
   }
 
-  // 2. Obtener las plantillas activas
-  const templatesRef = collection(this.firestore, `users/${this.usuario()?.uid}/plantillas`);
-  const templatesSnap = await getDocs(query(templatesRef, where('activo', '==', true)));
-
-  if (templatesSnap.empty) return;
-
-  // 3. Crear las instancias usando un batch para eficiencia atómica
-  const batch = writeBatch(this.firestore);
-
-  templatesSnap.forEach(templateDoc => {
-    const template = templateDoc.data();
-    const newExpenseRef = doc(collection(this.firestore, `users/${this.usuario()?.uid}/gastos`));
-
-    batch.set(newExpenseRef, {
-      month: targetMonth,
-      title: template.title,
-      amount: template.amount,
-      category: template.category,
-      isFixed: true,
-      status: 'sin_empezar',
-      templateId: templateDoc.id
-    });
-  });
-
-  await batch.commit();
-  console.log('Gastos fijos del mes inicializados con éxito.');
-} */
-
-async copiarPlantilla(templateId: string, targetMonth: string): Promise<void> {
+  //Copia Documento exactamente igual  
+  async copiarDocumento(templateId: string, targetMonth: string): Promise<void> {
     try {
       console.log(`Iniciando copia de plantilla ${templateId} para el mes ${targetMonth}`);
       // 1. Apuntar y obtener el documento de la plantilla origen
@@ -144,26 +161,51 @@ async copiarPlantilla(templateId: string, targetMonth: string): Promise<void> {
       }
 
       const templateData = templateSnap.data();
+      console.log(templateData)
 
       // 2. Apuntar a la colección de destino (expenses)
       const expensesRef = collection(this.firestore, `users/${this.usuario()?.uid}/plantillas`);
 
+      // 4. Guardar como un nuevo documento con ID automático en expenses
+      await addDoc(expensesRef, templateData);
+
+      console.log(`Plantilla copiada exitosamente a expenses para el mes ${targetMonth}`);
+
+    } catch (error) {
+      console.error('Error al copiar la plantilla:', error);
+      throw error;
+    }
+  }
+
+  async copiarPlantilla(origen: string, destino: string, templateId: string, targetMonth: string): Promise<void> {
+    try {
+      console.log(`Iniciando copia de plantilla ${templateId} para el mes ${targetMonth}`);
+      // 1. Apuntar y obtener el documento de la plantilla origen
+      const templateDocRef = doc(this.firestore, `users/${this.usuario()?.uid}/${origen}/${templateId}`);
+      const templateSnap = await getDoc(templateDocRef);
+
+      if (!templateSnap.exists()) {
+        throw new Error(`La plantilla con ID ${templateId} no existe.`);
+      }
+
+      const templateData = templateSnap.data();
+      console.log(templateData)
+
+      // 2. Apuntar a la colección de destino (expenses)
+      const documentRef = collection(this.firestore, `users/${this.usuario()?.uid}/${destino}`);
+
       // 3. Construir el nuevo objeto combinando los datos de la plantilla y los propios del gasto mensual
       const newExpensePayload = {
+        ...templateData,
         month: targetMonth,
-        title: templateData['title'],
-        amount: templateData['amount'],
-        category: templateData['category'],
-        isFixed: true,                      // Viene de plantilla, por ende es fijo
-        status: 'sin_empezar',              // Estado inicial requerido al inicio de mes
-        templateId: templateSnap.id,        // Referencia cruzada a la plantilla original
-        createdAt: serverTimestamp()        // Fecha de creación del registro
+        isFixed: true,
+        createdAt: serverTimestamp()
       };
 
       // 4. Guardar como un nuevo documento con ID automático en expenses
-      await addDoc(expensesRef, newExpensePayload);
+      await addDoc(documentRef, templateData);
 
-      console.log(`Plantilla copiada exitosamente a expenses para el mes ${targetMonth}`);
+      console.log(`Plantilla copiada exitosamente de ${origen} a ${destino} para el mes ${targetMonth}`);
 
     } catch (error) {
       console.error('Error al copiar la plantilla:', error);

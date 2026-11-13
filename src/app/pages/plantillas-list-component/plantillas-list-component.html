@@ -1,0 +1,64 @@
+<div class="overflow-x-auto">
+    <header class="flex justify-between items-center w-full">
+        <h4 class="font-bold text-lg mb-2">Plantillas
+        </h4>
+        <div class="space-x-2">
+            <!-- <button class="btn btn-neutral" (click)="inicializarMesGastos()">
+                <i class="fi fi-bs-sign-in-alt"></i>
+                Inicializar mes
+            </button>
+            <button class="btn btn-neutral" (click)="inicializarMesGastos()">
+                <i class="fi fi-ss-eye"></i>
+                Ver plantillas
+            </button> -->
+            <button class="btn btn-neutral" (click)="copiar()">
+                <i class="fi fi-br-plus"></i>
+                Agregar
+            </button>
+        </div>
+    </header>
+    <div class="divider"></div>
+    <div class="overflow-x-auto">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Id</th>
+                    <th>Concepto</th>
+                    <th>Día</th>
+                    <th>Categoría</th>
+                    <th>Monto Estimado</th>
+                    <th>Estado</th>
+                    <!-- <th>Fecha de pago</th> -->
+                </tr>
+            </thead>
+            <tbody>
+                @for (pago of pagos(); track pago.id) {
+                <tr [style.background-color]="pago.colorEstado">
+                    <td>{{pago.id}}</td>
+                    <td><b>{{pago.concepto}}</b></td>
+                    <td>{{pago.dia_vencimiento}}</td>
+                    <td>
+                        <div class="badge badge-soft" [style.background-color]="pago.colorCategoria">
+                            {{pago.nombreCategoria}}</div>
+                    </td>
+                    <td class="flex justify-end">{{pago.monto_estimado | currency:'Gs. ':'symbol':'1.0-0'}}</td>
+                    <td>
+                        <select class="select select-sm select-neutral w-full max-w-xs"
+                            (change)="cambiarEstado(pago.id, $event)">
+                            @for (item of estados(); track item.id) {
+                            <option [value]="item.id" [selected]="item.id === pago.estado.id">
+                                <span>{{item.nombre}}</span>
+                            </option>
+                            }
+                        </select>
+                    </td>
+                </tr>
+                } @empty {
+                <tr>
+                    <td colspan="6" class="text-center">No hay registros.</td>
+                </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

@@ -3,10 +3,20 @@
         <h4 class="font-bold text-lg mb-2">Mis Pagos <div class="badge badge-ghost badge-outline">{{ pagos().length }}
             </div>
         </h4>
-        <button class="btn btn-neutral">
-            <i class="fi fi-sr-plus-small"></i>
-            Agregar
-        </button>
+        <div class="space-x-2">
+            <button class="btn btn-neutral" (click)="inicializarMesGastos()">
+                <i class="fi fi-bs-sign-in-alt"></i>
+                Inicializar mes
+            </button>
+            <button class="btn btn-neutral" (click)="inicializarMesGastos()">
+                <i class="fi fi-ss-eye"></i>
+                Ver plantillas
+            </button>
+            <button class="btn btn-neutral" (click)="copiar()">
+                <i class="fi fi-br-plus"></i>
+                Agregar
+            </button>
+        </div>
     </header>
     <div class="divider"></div>
     <!--     <ul>
@@ -42,7 +52,7 @@
                 @for (pago of pagos(); track pago.id) {
                 <tr [style.background-color]="pago.colorEstado">
                     <td>{{pago.id}}</td>
-                    <td>{{pago.concepto}}</td>
+                    <td><b>{{pago.concepto}}</b></td>
                     <td>{{pago.dia_vencimiento}}</td>
                     <td>
                         <div class="badge badge-soft" [style.background-color]="pago.colorCategoria">

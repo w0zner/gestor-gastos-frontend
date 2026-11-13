@@ -52,13 +52,13 @@ export class PagosListComponent {
     const listaCategorias = this.categorias();
     const listaEstados = this.estados();
 
-    if(!listaPagos.length) return [];
+    if (!listaPagos.length) return [];
 
     return listaPagos.map((item: any) => {
       const estadoId = item.estado?.id;
       const categoriaId = item.categoria?.id;
-      const catMatch =  listaCategorias.find(c => c.id === categoriaId);
-      const estMatch =  listaEstados.find(e => e.id === estadoId);
+      const catMatch = listaCategorias.find(c => c.id === categoriaId);
+      const estMatch = listaEstados.find(e => e.id === estadoId);
 
       return {
         ...item,
@@ -80,7 +80,7 @@ export class PagosListComponent {
       console.log('Datos actuales de la señal estados():', this.estados());
 
       //effect(() => {
-        console.log('Usuario actual:', this.usuario()?.uid);
+      console.log('Usuario actual:', this.usuario()?.uid);
       //});
     });
   }
@@ -103,7 +103,17 @@ export class PagosListComponent {
     console.log('Copiando plantilla...');
     const templateId = 'nJVmNkzUxaaLcvJK3ppW';
     const targetMonth = '2026-12'; // Formato YYYY-MM
-    this.pagosService.copiarPlantilla(templateId, targetMonth)
+    this.pagosService.copiarDocumento(templateId, targetMonth)
+      .then(() => {
+        console.log('Plantilla copiada con éxito');
+      })
+      .catch((error) => {
+        console.error('Error al copiar la plantilla:', error);
+      });
+  }
+
+  inicializarMesGastos() {
+    this.pagosService.inicializarMesGastos()
       .then(() => {
         console.log('Plantilla copiada con éxito');
       })
