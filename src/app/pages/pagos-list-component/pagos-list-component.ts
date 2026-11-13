@@ -99,7 +99,18 @@ export class PagosListComponent {
     }
   }
 
-
+  copiar() {
+    console.log('Copiando plantilla...');
+    const templateId = 'nJVmNkzUxaaLcvJK3ppW';
+    const targetMonth = '2026-12'; // Formato YYYY-MM
+    this.pagosService.copiarPlantilla(templateId, targetMonth)
+      .then(() => {
+        console.log('Plantilla copiada con éxito');
+      })
+      .catch((error) => {
+        console.error('Error al copiar la plantilla:', error);
+      });
+  }
 
 
 }
