@@ -1,8 +1,12 @@
 import { Component, computed, inject, signal } from '@angular/core';
 import { PagosService } from '../../services/pagos-service';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { Auth, user } from '@angular/fire/auth';
+import { CurrencyPipe, DatePipe, NgClass } from '@angular/common';
+import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { PlantillasFormComponent } from '../plantillas-form-component/plantillas-form-component';
+
 
 interface Pago {
   id?: string;
@@ -22,14 +26,15 @@ interface Pago {
 
 @Component({
   selector: 'app-plantillas-list-component',
-  imports: [],
   templateUrl: './plantillas-list-component.html',
   styleUrl: './plantillas-list-component.css',
+  imports: [ReactiveFormsModule, CurrencyPipe, RouterLink, PlantillasFormComponent]
 })
 export class PlantillasListComponent {
   private pagosService = inject(PagosService);
   private router = inject(Router);
   private auth = inject(Auth);
+
 
   usuario = toSignal(user(this.auth), { initialValue: null });
 
@@ -43,13 +48,13 @@ export class PlantillasListComponent {
   estados = toSignal(this.pagosService.getEstados(), { initialValue: [] });
 
   pagos = computed(() => {
-    const listaPagos = this.plantillasRaw();
+    const listaPlantillas = this.plantillasRaw();
     const listaCategorias = this.categorias();
     const listaEstados = this.estados();
 
-    if (!listaPagos.length) return [];
+    if (!listaPlantillas.length) return [];
 
-    return listaPagos.map((item: any) => {
+    return listaPlantillas.map((item: any) => {
       const estadoId = item.estado?.id;
       const categoriaId = item.categoria?.id;
       const catMatch = listaCategorias.find(c => c.id === categoriaId);
@@ -65,6 +70,7 @@ export class PlantillasListComponent {
       };
     });
   });
+//my_modal_3: any;
 
   copiar() {
     console.log('Copiando plantilla...');

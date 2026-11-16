@@ -1,21 +1,22 @@
-<div class="overflow-x-auto">
+<div class="overflow-x-auto animate__animated animate__fadeIn">
     <header class="flex justify-between items-center w-full">
         <h4 class="font-bold text-lg mb-2">Mis Pagos <div class="badge badge-ghost badge-outline">{{ pagos().length }}
             </div>
         </h4>
         <div class="space-x-2">
+            <a role="button" class="btn btn-neutral" routerLink="/inicio/plantillas">
+                <i class="fi fi-ss-eye"></i>
+                Ver plantillas
+            </a>
             <button class="btn btn-neutral" (click)="inicializarMesGastos()">
                 <i class="fi fi-bs-sign-in-alt"></i>
                 Inicializar mes
             </button>
-            <button class="btn btn-neutral" (click)="inicializarMesGastos()">
-                <i class="fi fi-ss-eye"></i>
-                Ver plantillas
-            </button>
-            <button class="btn btn-neutral" (click)="copiar()">
+
+            <!-- <button class="btn btn-neutral" (click)="copiar()">
                 <i class="fi fi-br-plus"></i>
                 Agregar
-            </button>
+            </button> -->
         </div>
     </header>
     <div class="divider"></div>
@@ -33,7 +34,7 @@
         <table class="table">
             <thead>
                 <tr>
-                    <th>Id</th>
+                    <th>ID</th>
                     <th>Concepto</th>
                     <th>Día</th>
                     <th>Categoría</th>

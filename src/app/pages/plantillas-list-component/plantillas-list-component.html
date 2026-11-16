@@ -1,6 +1,6 @@
-<div class="overflow-x-auto">
+<div class="overflow-x-auto animate__animated animate__fadeIn">
     <header class="flex justify-between items-center w-full">
-        <h4 class="font-bold text-lg mb-2">Plantillas
+        <h4 class="font-bold text-lg mb-2">Mis Plantillas
         </h4>
         <div class="space-x-2">
             <!-- <button class="btn btn-neutral" (click)="inicializarMesGastos()">
@@ -11,7 +11,11 @@
                 <i class="fi fi-ss-eye"></i>
                 Ver plantillas
             </button> -->
-            <button class="btn btn-neutral" (click)="copiar()">
+            <a role="button" class="btn btn-neutral" routerLink="/inicio/pagos">
+                <i class="fi fi-ss-document"></i>
+                Ver Pagos
+            </a>
+            <button class="btn btn-neutral" onclick="my_modal_3.showModal()">
                 <i class="fi fi-br-plus"></i>
                 Agregar
             </button>
@@ -22,13 +26,13 @@
         <table class="table">
             <thead>
                 <tr>
-                    <th>Id</th>
+                    <th>ID</th>
                     <th>Concepto</th>
                     <th>Día</th>
                     <th>Categoría</th>
                     <th>Monto Estimado</th>
                     <th>Estado</th>
-                    <!-- <th>Fecha de pago</th> -->
+                    <th>Acciones</th>
                 </tr>
             </thead>
             <tbody>
@@ -43,15 +47,23 @@
                     </td>
                     <td class="flex justify-end">{{pago.monto_estimado | currency:'Gs. ':'symbol':'1.0-0'}}</td>
                     <td>
-                        <select class="select select-sm select-neutral w-full max-w-xs"
-                            (change)="cambiarEstado(pago.id, $event)">
-                            @for (item of estados(); track item.id) {
-                            <option [value]="item.id" [selected]="item.id === pago.estado.id">
-                                <span>{{item.nombre}}</span>
-                            </option>
-                            }
-                        </select>
+                      <div class="badge badge-soft" [style.background-color]="pago.colorEstado">
+                        {{pago.nombreEstado}}
+                      </div>
                     </td>
+                    <td>
+                      <div class="flex space-x-1">
+                        <button class="btn btn-ghost">
+                          <i class="fi fi-rr-copy"></i>
+                        </button>
+                        <button class="btn btn-ghost">
+                          <i class="fi fi-rr-edit"></i>
+                        </button>
+                        <button class="btn btn-ghost" >
+                          <i class="fi fi-rr-trash text-red-600"></i>
+
+                        </button>
+                      </div>
                 </tr>
                 } @empty {
                 <tr>
@@ -61,4 +73,8 @@
             </tbody>
         </table>
     </div>
+
+<app-plantillas-form-component></app-plantillas-form-component>
 </div>
+
+

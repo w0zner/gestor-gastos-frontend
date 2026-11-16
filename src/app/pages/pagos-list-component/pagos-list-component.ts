@@ -1,7 +1,7 @@
 import { Component, computed, effect, inject, signal } from '@angular/core';
 import { PagosService } from '../../services/pagos-service';
 import { Auth, user } from '@angular/fire/auth';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { CurrencyPipe, DatePipe, NgClass } from '@angular/common';
 import { collection, Firestore } from 'firebase/firestore';
 import { collectionData } from '@angular/fire/firestore';
@@ -28,7 +28,7 @@ interface Pago {
   selector: 'app-pagos-list-component',
   templateUrl: './pagos-list-component.html',
   styleUrl: './pagos-list-component.css',
-  imports: [DatePipe, CurrencyPipe]
+  imports: [DatePipe, CurrencyPipe, RouterLink]
 })
 export class PagosListComponent {
   private pagosService = inject(PagosService);
