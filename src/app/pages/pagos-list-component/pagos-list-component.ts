@@ -22,6 +22,8 @@ interface Pago {
   categoria: string;
   esFijo: boolean;
   templateId?: string;
+  activo: boolean;
+  fecha_creacion: string;
 }
 
 @Component({
@@ -34,6 +36,8 @@ export class PagosListComponent {
   private pagosService = inject(PagosService);
   private router = inject(Router);
   private auth = inject(Auth);
+
+
 
   usuario = toSignal(user(this.auth), { initialValue: null });
 
@@ -103,7 +107,7 @@ export class PagosListComponent {
     console.log('Copiando plantilla...');
     const templateId = 'nJVmNkzUxaaLcvJK3ppW';
     const targetMonth = '2026-12'; // Formato YYYY-MM
-    this.pagosService.copiarDocumento(templateId, targetMonth)
+    this.pagosService.copiarDocumento('plantillas', 'gastos', templateId, targetMonth)
       .then(() => {
         console.log('Plantilla copiada con éxito');
       })

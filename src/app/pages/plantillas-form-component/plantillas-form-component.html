@@ -1,166 +1,156 @@
-<dialog id="my_modal_3" class="modal">
-  <div class="modal-box w-11/12 max-w-2xl">
-    <form method="dialog">
-      <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button>
-    </form>
-    <form [formGroup]="form" (ngSubmit)="onSubmit()" method="dialog">
-      <div>
-        <h3 class="font-bold text-lg">Agregar Plantilla</h3>
-        <div class="divider"></div>
-        <div class="flex row space-x-2 mb-2">
-          <div class="form-control w-full max-w-xs">
-              <label class="label">
-                <span class="label-text">Concepto <span class="text-error">*</span></span>
-              </label>
-              <input type="text" formControlName="concepto" placeholder="Concepto" class="input input-bordered w-full max-w-xs" />
-          </div>
+@if (isOpen()) {
+  <dialog #dialog id="my_modal_3" class="modal animate__animated animate__fadeIn">
+    <div class="modal-box w-11/12 max-w-2xl">
+      <form method="dialog">
+        <button class="btn btn-sm  absolute right-2 top-2" (click)="onClose()">✕</button>
+      </form>
+      <form [formGroup]="form" (ngSubmit)="onSubmit()" method="dialog">
+        <div>
+          <h3 class="font-bold text-lg">Agregar Plantilla</h3>
+          <div class="divider"></div>
+          <div class="flex row space-x-2 mb-2">
+            <div class="form-control w-full max-w-xs">
+                <label class="label">
+                  <span class="label-text">Concepto <span class="text-error">*</span></span>
+                </label>
+                <input type="text" formControlName="concepto" placeholder="Concepto" class="input input-bordered w-full max-w-xs" />
+            </div>
 
-          <div class="form-control w-full max-w-xs">
-            <label class="label">
-              <span class="label-text">Día de Vencimiento <span class="text-error">*</span></span>
-            </label>
-            <input type="number" formControlName="dia_vencimiento" placeholder="Día de Vencimiento" class="input input-bordered w-full max-w-xs" />
-          </div>
-        </div>
-        <div class="flex row space-x-2 mb-2">
-          <div class="form-control w-full max-w-xs">
-            <label class="label">
-              <span class="label-text">Mes <span class="text-error">*</span></span>
-            </label>
-            <input type="number" formControlName="mes" placeholder="Mes" class="input input-bordered w-full max-w-xs" />
-          </div>
-          <div class="form-control w-full max-w-xs">
-            <label class="label">
-              <span class="label-text">Año <span class="text-error">*</span></span>
-            </label>
-            <input type="number" formControlName="anho" placeholder="Año" class="input input-bordered w-full max-w-xs" />
-          </div>
-        </div>
-
-        <div class="flex row space-x-2 mb-2">
             <div class="form-control w-full max-w-xs">
               <label class="label">
-                <span class="label-text">Categoria <span class="text-error">*</span></span>
+                <span class="label-text">Día de Vencimiento <span class="text-error">*</span></span>
               </label>
-              <select class="select w-full max-w-xs" formControlName="categoria">
-                  @for (item of categorias(); track item.id) {
-                  <option [value]="item.id">
-                      <span>{{item.nombre}}</span>
-                  </option>
-                  }
-              </select>
+              <input type="number" formControlName="dia_vencimiento" placeholder="Día de Vencimiento" class="input input-bordered w-full max-w-xs" />
+            </div>
+          </div>
+          <div class="flex row space-x-2 mb-2">
+            <div class="form-control w-full max-w-xs">
+              <label class="label">
+                <span class="label-text">Mes <span class="text-error">*</span></span>
+              </label>
+              <input type="number" formControlName="mes" placeholder="Mes" class="input input-bordered w-full max-w-xs" />
             </div>
             <div class="form-control w-full max-w-xs">
               <label class="label">
-                <span class="label-text">Estado <span class="text-error">*</span></span>
+                <span class="label-text">Año <span class="text-error">*</span></span>
               </label>
-              <select class="select w-full max-w-xs" formControlName="estado">
-                  @for (item of estados(); track item.id) {
-                  <option [value]="item.id" [selected]="item.nombre === 'Sin empezar'">
-                      <span>{{item.nombre}}</span>
-                  </option>
-                  }
-              </select>
-            </div>
-        </div>
-
-        <div class="flex row space-x-2 mb-2">
-          <div class="form-control w-full max-w-xs">
-            <label class="label">
-              <span class="label-text">Monto Estimado <span class="text-error">*</span></span>
-            </label>
-            <input type="number" formControlName="monto_estimado" placeholder="Monto Estimado" class="input input-bordered w-full max-w-xs" />
-          </div>
-          <div class="form-control w-full max-w-xs">
-            <label class="label">
-              <span class="label-text">Gasto Fijo <span class="text-error">*</span></span>
-            </label>
-<div>
-  <label class="toggle text-base-content">
-  <input type="checkbox" formControlName="esFijo" />
-
-  <svg
-    aria-label="disabled"
-    xmlns="http://www.w3.org/2000/svg"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    stroke-width="4"
-    stroke-linecap="round"
-    stroke-linejoin="round"
-  >
-    <path d="M18 6 6 18" />
-    <path d="m6 6 12 12" />
-  </svg>
-   <svg aria-label="enabled" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-    <g
-      stroke-linejoin="round"
-      stroke-linecap="round"
-      stroke-width="4"
-      fill="none"
-      stroke="currentColor"
-    >
-      <path d="M20 6 9 17l-5-5"></path>
-    </g>
-  </svg>
-</label>
-</div>
-          </div>
-        </div>
-
-        <div class="flex row space-x-2 mb-2">
-          <div class="form-control w-full max-w-xs">
-            <label class="label">
-              <span class="label-text">Activo <span class="text-error">*</span></span>
-            </label>
-            <div>
-              <label class="toggle text-base-content">
-  <input type="checkbox" formControlName="activo" />
-
-  <svg
-    aria-label="disabled"
-    xmlns="http://www.w3.org/2000/svg"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    stroke-width="4"
-    stroke-linecap="round"
-    stroke-linejoin="round"
-  >
-    <path d="M18 6 6 18" />
-    <path d="m6 6 12 12" />
-  </svg>
-   <svg aria-label="enabled" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-    <g
-      stroke-linejoin="round"
-      stroke-linecap="round"
-      stroke-width="4"
-      fill="none"
-      stroke="currentColor"
-    >
-      <path d="M20 6 9 17l-5-5"></path>
-    </g>
-  </svg>
-</label>
+              <input type="number" formControlName="anho" placeholder="Año" class="input input-bordered w-full max-w-xs" />
             </div>
           </div>
-          <div class="form-control w-full max-w-xs">
-            <label class="label">
-              <span class="label-text">Notas</span>
-            </label>
-  <textarea class="textarea h-18" placeholder="Notas" formControlName="notas"></textarea>
+
+          <div class="flex row space-x-2 mb-2">
+              <div class="form-control w-full max-w-xs">
+                <label class="label">
+                  <span class="label-text">Categoria <span class="text-error">*</span></span>
+                </label>
+                <select class="select w-full max-w-xs" formControlName="categoria">
+                    @for (item of categorias(); track item.id) {
+                    <option [value]="item.id">
+                        <span>{{item.nombre}}</span>
+                    </option>
+                    }
+                </select>
+              </div>
+              <div class="form-control w-full max-w-xs">
+                <label class="label">
+                  <span class="label-text">Estado <span class="text-error">*</span></span>
+                </label>
+                <select class="select w-full max-w-xs" formControlName="estado">
+                    @for (item of estados(); track item.id) {
+                    <option [value]="item.id">
+                        <span>{{item.nombre}}</span>
+                    </option>
+                    }
+                </select>
+              </div>
           </div>
-        </div>
 
-        <div class="flex justify-end space-x-2">
-          <button class="btn btn-neutral" onclick="my_modal_3.close()">
-            <i class="fi fi-rr-ban"></i>
-            Cancelar</button>
-          <button class="btn btn-primary" type="submit" [disabled]="!canSubmit()">
-            <i class="fi fi-br-check"></i>Guardar</button>
-        </div>
 
-      </div>
-    </form>
-  </div>
-</dialog>
+          <div class="flex row space-x-2 mb-2">
+            <div class="form-control w-full max-w-xs">
+              <label class="label">
+                <span class="label-text">Monto Estimado <span class="text-error">*</span></span>
+              </label>
+              <input type="number" formControlName="monto_estimado" placeholder="Monto Estimado"
+                class="input input-bordered w-full max-w-xs" />
+            </div>
+
+
+            <div class="flex pl-3 row w-full justify-between items-center space-x-4">
+                <!-- Toggle gasto fijo -->
+                <div class="form-control w-full max-w-xs">
+                    <label class="label">
+                    <span class="label-text">Gasto Fijo <span class="text-error">*</span></span>
+                  </label>
+                  <div>
+                    <label class="toggle text-base-content">
+                      <input type="checkbox" formControlName="esFijo" />
+
+                      <svg aria-label="disabled" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M18 6 6 18" />
+                        <path d="m6 6 12 12" />
+                      </svg>
+                      <svg aria-label="enabled" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                        <g stroke-linejoin="round" stroke-linecap="round" stroke-width="4" fill="none" stroke="currentColor">
+                          <path d="M20 6 9 17l-5-5"></path>
+                        </g>
+                      </svg>
+                    </label>
+                  </div>
+                </div>
+
+                <!-- Toggle activo -->
+                <div class="form-control w-full max-w-xs">
+                  <label class="label">
+                    <span class="label-text">Activo <span class="text-error">*</span></span>
+                  </label>
+                  <div>
+                    <label class="toggle text-base-content">
+                      <input type="checkbox" formControlName="activo" />
+
+                      <svg aria-label="disabled" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M18 6 6 18" />
+                        <path d="m6 6 12 12" />
+                      </svg>
+                      <svg aria-label="enabled" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                        <g stroke-linejoin="round" stroke-linecap="round" stroke-width="4" fill="none" stroke="currentColor">
+                          <path d="M20 6 9 17l-5-5"></path>
+                        </g>
+                      </svg>
+                    </label>
+                  </div>
+                </div>
+            </div>
+          </div>
+
+
+          <div class="row mb-2">
+
+            <div class="form-control w-full">
+              <label class="label">
+                <span class="label-text">Notas</span>
+              </label>
+              <textarea class="textarea h-18 w-full" placeholder="Escribre una nota u observación" formControlName="notas"></textarea>
+            </div>
+          </div>
+
+          <div class="divider"></div>
+
+          <div class="flex justify-end space-x-2">
+            <button class="btn btn-neutral" (click)="onClose()">
+              <i class="fi fi-rr-ban"></i>
+              Cancelar
+            </button>
+            <button class="btn btn-primary" type="submit" [disabled]="!canSubmit()">
+              <i class="fi fi-br-check"></i>Guardar
+            </button>
+          </div>
+
+        </div>
+      </form>
+    </div>
+  </dialog>
+}
+

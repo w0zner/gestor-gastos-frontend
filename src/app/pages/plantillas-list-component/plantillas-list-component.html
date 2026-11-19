@@ -9,13 +9,13 @@
             </button>
             <button class="btn btn-neutral" (click)="inicializarMesGastos()">
                 <i class="fi fi-ss-eye"></i>
-                Ver plantillas
+                Ver plantillas onclick="my_modal_3.showModal()"
             </button> -->
             <a role="button" class="btn btn-neutral" routerLink="/inicio/pagos">
                 <i class="fi fi-ss-document"></i>
                 Ver Pagos
             </a>
-            <button class="btn btn-neutral" onclick="my_modal_3.showModal()">
+            <button class="btn btn-neutral" (click)="openCreateModal()">
                 <i class="fi fi-br-plus"></i>
                 Agregar
             </button>
@@ -31,6 +31,7 @@
                     <th>Día</th>
                     <th>Categoría</th>
                     <th>Monto Estimado</th>
+                    <th>Fecha de Creación</th>
                     <th>Estado</th>
                     <th>Acciones</th>
                 </tr>
@@ -45,7 +46,8 @@
                         <div class="badge badge-soft" [style.background-color]="pago.colorCategoria">
                             {{pago.nombreCategoria}}</div>
                     </td>
-                    <td class="flex justify-end">{{pago.monto_estimado | currency:'Gs. ':'symbol':'1.0-0'}}</td>
+                    <td >{{pago.monto_estimado | currency:'Gs. ':'symbol':'1.0-0'}}</td>
+                    <td>{{pago.fecha_creacion | date :'dd/MM/yyyy'}}</td>
                     <td>
                       <div class="badge badge-soft" [style.background-color]="pago.colorEstado">
                         {{pago.nombreEstado}}
@@ -53,15 +55,14 @@
                     </td>
                     <td>
                       <div class="flex space-x-1">
-                        <button class="btn btn-ghost">
+                        <button class="btn btn-ghost" (click)="copiar(pago)">
                           <i class="fi fi-rr-copy"></i>
                         </button>
-                        <button class="btn btn-ghost">
+                        <button class="btn btn-ghost" (click)="openEditModal(pago)">
                           <i class="fi fi-rr-edit"></i>
                         </button>
-                        <button class="btn btn-ghost" >
+                        <button class="btn btn-ghost" (click)="eliminarPlantilla(pago)">
                           <i class="fi fi-rr-trash text-red-600"></i>
-
                         </button>
                       </div>
                 </tr>
@@ -74,7 +75,12 @@
         </table>
     </div>
 
-<app-plantillas-form-component></app-plantillas-form-component>
+<app-plantillas-form-component
+[isOpen]="isModalOpen()"
+[item]="selectedExpense()"
+(close)="closeModal()"
+(save)="manejoGuardado($any($event))"
+/>
 </div>
 
 

@@ -1,4 +1,4 @@
-import { Component, computed, inject, signal } from '@angular/core';
+import { Component, computed, effect, ElementRef, inject, signal, viewChild } from '@angular/core';
 import { PagosService } from '../../services/pagos-service';
 import { Router, RouterLink } from '@angular/router';
 import { toSignal } from '@angular/core/rxjs-interop';
@@ -22,30 +22,37 @@ interface Pago {
   categoria: string;
   esFijo: boolean;
   templateId?: string;
+  fecha_creacion: string;
+  activo: boolean;
 }
 
 @Component({
   selector: 'app-plantillas-list-component',
   templateUrl: './plantillas-list-component.html',
   styleUrl: './plantillas-list-component.css',
-  imports: [ReactiveFormsModule, CurrencyPipe, RouterLink, PlantillasFormComponent]
+  imports: [DatePipe, ReactiveFormsModule, CurrencyPipe, RouterLink, PlantillasFormComponent]
 })
 export class PlantillasListComponent {
   private pagosService = inject(PagosService);
-  private router = inject(Router);
   private auth = inject(Auth);
-
 
   usuario = toSignal(user(this.auth), { initialValue: null });
 
-  categoriasMap: { [key: string]: any } = {};
-  estadosMap: { [key: string]: any } = {};
+  isModalOpen = signal(false);
+  selectedExpense = signal<Pago | null>(null);
 
   listaPagos = signal<Pago[]>([]);
 
   plantillasRaw = toSignal(this.pagosService.getPlantillas(true), { initialValue: [] });
   categorias = toSignal(this.pagosService.getCategorias(), { initialValue: [] });
   estados = toSignal(this.pagosService.getEstados(), { initialValue: [] });
+
+  constructor() {
+    effect(() => {
+      console.log('Modal estado:', this.isModalOpen());
+      console.log(this.selectedExpense());
+    });
+  }
 
   pagos = computed(() => {
     const listaPlantillas = this.plantillasRaw();
@@ -60,8 +67,22 @@ export class PlantillasListComponent {
       const catMatch = listaCategorias.find(c => c.id === categoriaId);
       const estMatch = listaEstados.find(e => e.id === estadoId);
 
+      const rawFecha = item.fecha_creacion;
+      let fechaNormalizada: Date | null = null;
+
+      if (rawFecha) {
+        if (typeof rawFecha.toDate === 'function') {
+          fechaNormalizada = rawFecha.toDate();
+        } else if (rawFecha.seconds) {
+          fechaNormalizada = new Date(rawFecha.seconds * 1000);
+        } else {
+          fechaNormalizada = new Date(rawFecha);
+        }
+      }
+
       return {
         ...item,
+        fecha_creacion: fechaNormalizada,
         nombreCategoria: catMatch ? catMatch.nombre : 'Sin categoría',
         colorCategoria: catMatch ? catMatch.color : '#000000',
 
@@ -70,18 +91,62 @@ export class PlantillasListComponent {
       };
     });
   });
-//my_modal_3: any;
 
-  copiar() {
+
+  openCreateModal() {
+    this.selectedExpense.set(null);
+    this.isModalOpen.set(true);
+  }
+
+  openEditModal(expense: Pago) {
+    this.selectedExpense.set(expense);
+    this.isModalOpen.set(true);
+  }
+
+  closeModal() {
+    console.log('Cerrando modal...');
+    this.isModalOpen.set(false);
+    this.selectedExpense.set(null);
+  }
+
+  async manejoGuardado(event: { id?: string; payload: Omit<Pago, 'id'> }) {
+    if(event.id) {
+      console.log('Guardando cambios en el pago con ID:', event.id, 'con datos:', event.payload);
+      await this.pagosService.updateDoc(event.id, event.payload, 'plantillas');
+    } else {
+      console.log('Creando nuevo pago con datos:', event.payload);
+      await this.pagosService.createDoc(event.payload, 'plantillas');
+    }
+    this.closeModal();
+  }
+
+  copiar(pago: Pago) {
     console.log('Copiando plantilla...');
-    const templateId = 'nJVmNkzUxaaLcvJK3ppW';
-    const targetMonth = '2026-12'; // Formato YYYY-MM
-    this.pagosService.copiarDocumento(templateId, targetMonth)
+    const mesActual = new Date().getMonth() + 1;
+    const anhoActual = new Date().getFullYear();
+    const templateId = pago.id;
+    this.pagosService.copiarPlantilla('plantillas', 'plantillas', templateId!, mesActual.toString(), anhoActual.toString())
       .then(() => {
         console.log('Plantilla copiada con éxito');
       })
       .catch((error) => {
         console.error('Error al copiar la plantilla:', error);
+      });
+  }
+
+  eliminarPlantilla(pago: Pago) {
+    console.log('Eliminando plantilla con ID:', pago.id);
+    if (!pago.id) {
+      console.error('No se puede eliminar la plantilla: ID no definido.');
+      return;
+    }
+
+    this.pagosService.deleteTemplate('plantillas', pago.id)
+      .then(() => {
+        console.log(`Plantilla con ID ${pago.id} eliminada con éxito.`);
+      })
+      .catch((error) => {
+        console.error('Error al eliminar la plantilla:', error);
       });
   }
 }

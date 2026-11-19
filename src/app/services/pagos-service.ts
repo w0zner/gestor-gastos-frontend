@@ -2,7 +2,7 @@ import { computed, effect, inject, Injectable } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { Auth, user } from '@angular/fire/auth';
 import { collectionData, Firestore } from '@angular/fire/firestore';
-import { addDoc, collection, doc, getDoc, getDocs, orderBy, query, serverTimestamp, updateDoc, where, writeBatch } from 'firebase/firestore';
+import { addDoc, collection, deleteDoc, doc, getDoc, getDocs, orderBy, query, serverTimestamp, updateDoc, where, writeBatch } from 'firebase/firestore';
 import { Observable, of, switchMap } from 'rxjs';
 
 @Injectable({
@@ -101,13 +101,39 @@ export class PagosService {
       categoria: templateData.categoria,
       esFijo: templateData.esFijo,
       activo: true,
-      createdAt: new Date()
+      fecha_creacion: serverTimestamp()
+    });
+  }
+
+  async createDoc(payload: any, target: string): Promise<void> {
+    const templatesRef = collection(this.firestore, `users/${this.usuario()?.uid}/${target}`);
+    const estadoRef = doc(this.firestore, `estados/${payload.estado}`);
+    const categoriaRef = doc(this.firestore, `categorias/${payload.categoria}`);
+
+    await addDoc(templatesRef, {
+      ...payload,
+      estado: estadoRef,
+      categoria: categoriaRef,
+      fecha_creacion: serverTimestamp()
+    });
+  }
+
+  async updateDoc(id: string, payload: any, target: string): Promise<void> {
+    const ref = doc(this.firestore, `users/${this.usuario()?.uid}/${target}/${id}`);
+    const estadoRef = doc(this.firestore, `estados/${payload.estado}`);
+    const categoriaRef = doc(this.firestore, `categorias/${payload.categoria}`);
+
+    await updateDoc(ref, {
+      ...payload,
+      estado: estadoRef,
+      categoria: categoriaRef
     });
   }
 
 
   async inicializarMesGastos() {
     const mesActual = new Date().getMonth() + 1;
+    const anhoActual = new Date().getFullYear();
     const expensesRef = collection(this.firestore, `users/${this.usuario()?.uid}/gastos`);
 
     // 1. Verificar si ya existen gastos fijos generados para este mes (ej. "2026-11")
@@ -139,8 +165,9 @@ export class PagosService {
       batch.set(newExpenseRef, {
         ...template,
         mes: mesActual,
+        anho: anhoActual,
         esFijo: true,
-        createdAt: serverTimestamp()
+        fecha_creacion: serverTimestamp()
       });
     });
 
@@ -148,12 +175,12 @@ export class PagosService {
     console.log('Gastos fijos del mes inicializados con éxito.');
   }
 
-  //Copia Documento exactamente igual  
-  async copiarDocumento(templateId: string, targetMonth: string): Promise<void> {
+  //Copia Documento exactamente igual
+  async copiarDocumento(source: string, target: string,templateId: string, targetMonth: string): Promise<void> {
     try {
-      console.log(`Iniciando copia de plantilla ${templateId} para el mes ${targetMonth}`);
+      console.log(`Iniciando copia desde ${source} ${templateId} hacia ${target} para el mes ${targetMonth}`);
       // 1. Apuntar y obtener el documento de la plantilla origen
-      const templateDocRef = doc(this.firestore, `users/${this.usuario()?.uid}/gastos/${templateId}`);
+      const templateDocRef = doc(this.firestore, `users/${this.usuario()?.uid}/${source}/${templateId}`);
       const templateSnap = await getDoc(templateDocRef);
 
       if (!templateSnap.exists()) {
@@ -164,7 +191,7 @@ export class PagosService {
       console.log(templateData)
 
       // 2. Apuntar a la colección de destino (expenses)
-      const expensesRef = collection(this.firestore, `users/${this.usuario()?.uid}/plantillas`);
+      const expensesRef = collection(this.firestore, `users/${this.usuario()?.uid}/${target}`);
 
       // 4. Guardar como un nuevo documento con ID automático en expenses
       await addDoc(expensesRef, templateData);
@@ -177,7 +204,8 @@ export class PagosService {
     }
   }
 
-  async copiarPlantilla(origen: string, destino: string, templateId: string, targetMonth: string): Promise<void> {
+  async copiarPlantilla(origen: string, destino: string, templateId: string, mes: string, anho: string): Promise<void> {
+    const targetMonth = `${anho}-${mes}`; // Formato YYYY-MM
     try {
       console.log(`Iniciando copia de plantilla ${templateId} para el mes ${targetMonth}`);
       // 1. Apuntar y obtener el documento de la plantilla origen
@@ -197,13 +225,14 @@ export class PagosService {
       // 3. Construir el nuevo objeto combinando los datos de la plantilla y los propios del gasto mensual
       const newExpensePayload = {
         ...templateData,
-        month: targetMonth,
-        isFixed: true,
-        createdAt: serverTimestamp()
+        mes: mes,
+        anho: anho,
+        esFijo: true,
+        fecha_creacion: serverTimestamp()
       };
 
       // 4. Guardar como un nuevo documento con ID automático en expenses
-      await addDoc(documentRef, templateData);
+      await addDoc(documentRef, newExpensePayload);
 
       console.log(`Plantilla copiada exitosamente de ${origen} a ${destino} para el mes ${targetMonth}`);
 
@@ -211,6 +240,16 @@ export class PagosService {
       console.error('Error al copiar la plantilla:', error);
       throw error;
     }
+  }
+
+  async deleteTemplate(target: string, templateId: string): Promise<void> {
+    console.log('Intentando eliminar plantilla con ID:', templateId);
+    if (!templateId) {
+      throw new Error('Se requiere un ID válido para eliminar la plantilla.');
+    }
+
+    const docRef = doc(this.firestore, `users/${this.usuario()?.uid}/${target}/${templateId}`);
+    await deleteDoc(docRef);
   }
 }
 
