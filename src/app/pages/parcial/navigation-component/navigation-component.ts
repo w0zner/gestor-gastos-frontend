@@ -1,8 +1,8 @@
 import { AsyncPipe, NgIf } from '@angular/common';
-import { Component, effect, inject } from '@angular/core';
-import { toSignal } from '@angular/core/rxjs-interop';
+import { Component, inject } from '@angular/core';
 import { Auth, user } from '@angular/fire/auth';
-import { Router, RouterLink } from '@angular/router';
+import { Router } from '@angular/router';
+import { SidebarService } from '../../../services/sidebar-service';
 
 @Component({
   selector: 'app-navigation-component',
@@ -16,23 +16,17 @@ import { Router, RouterLink } from '@angular/router';
 export class NavigationComponent {
   private router = inject(Router);
   private auth = inject(Auth);
+  sidebarService = inject(SidebarService);
 
   usuario$ = user(this.auth);
-  //user = toSignal(user(this.auth), { initialValue: null });
-
-  /* constructor() {
-    effect(() => {
-      console.log(this.user());
-    });
-  } */
 
   cerrarSesion() {
     try {
-      this.auth.signOut().then((result) => {
+      this.auth.signOut().then(() => {
         this.router.navigateByUrl('/auth');
       });
     } catch (error) {
-      console.error('Error al cerrar sesión' + error);
+      console.error('Error al cerrar sesión', error);
     }
   }
 }

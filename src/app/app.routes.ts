@@ -1,30 +1,51 @@
 import { Routes } from '@angular/router';
-import { AuthComponent } from './pages/auth-component/auth-component';
-import { PagosListComponent } from './pages/pagos-list-component/pagos-list-component';
-import { InicioComponent } from './pages/parcial/inicio-component/inicio-component';
-import { AuthGuard, redirectUnauthorizedTo } from '@angular/fire/auth-guard';
-import { PlantillasListComponent } from './pages/plantillas-list-component/plantillas-list-component';
-import { PlantillasFormComponent } from './pages/plantillas-form-component/plantillas-form-component';
-import { CategoriasListComponent } from './pages/categorias-list-component/categorias-list-component';
-import { EstadosListComponent } from './pages/estados-list-component/estados-list-component';
+import { AuthGuard } from '@angular/fire/auth-guard';
+
 export const routes: Routes = [
-  { path: 'auth', component: AuthComponent },
-
-
   {
-    path: 'inicio', component: InicioComponent,
-    canActivate: [AuthGuard],
-    //data: { authGuardPipe: redirectUnauthorizedTo(['auth']) },
-    children: [
-      { path: 'pagos', component: PagosListComponent },
-      { path: 'plantillas', component: PlantillasListComponent },
-      { path: 'categorias', component: CategoriasListComponent },
-      { path: 'estados', component: EstadosListComponent },
-      /*{ path: 'plantillas/:id', component: PlantillasFormComponent },*/
-      { path: '', redirectTo: 'pagos', pathMatch: 'full' }, // Por defecto muestra pagos
-    ]
+    path: 'auth',
+    loadComponent: () =>
+      import('./pages/auth-component/auth-component').then((m) => m.AuthComponent),
   },
-
+  {
+    path: 'inicio',
+    loadComponent: () =>
+      import('./pages/parcial/inicio-component/inicio-component').then(
+        (m) => m.InicioComponent
+      ),
+    canActivate: [AuthGuard],
+    children: [
+      {
+        path: 'pagos',
+        loadComponent: () =>
+          import('./pages/pagos-list-component/pagos-list-component').then(
+            (m) => m.PagosListComponent
+          ),
+      },
+      {
+        path: 'plantillas',
+        loadComponent: () =>
+          import(
+            './pages/plantillas-list-component/plantillas-list-component'
+          ).then((m) => m.PlantillasListComponent),
+      },
+      {
+        path: 'categorias',
+        loadComponent: () =>
+          import(
+            './pages/categorias-list-component/categorias-list-component'
+          ).then((m) => m.CategoriasListComponent),
+      },
+      {
+        path: 'estados',
+        loadComponent: () =>
+          import('./pages/estados-list-component/estados-list-component').then(
+            (m) => m.EstadosListComponent
+          ),
+      },
+      { path: '', redirectTo: 'pagos', pathMatch: 'full' },
+    ],
+  },
   { path: '', redirectTo: 'auth', pathMatch: 'full' },
-  { path: '**', redirectTo: 'auth' }
+  { path: '**', redirectTo: 'auth' },
 ];

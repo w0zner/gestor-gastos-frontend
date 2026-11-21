@@ -2,4 +2,11 @@
 
 @import 'tailwindcss';
 @plugin 'daisyui';
-@import "@flaticon/flaticon-uicons/css/all/all";
+
+/* En lugar de all/all, importamos solo las variantes utilizadas en la app */
+@import "@flaticon/flaticon-uicons/css/brands/all.css";
+@import "@flaticon/flaticon-uicons/css/regular/rounded.css";
+@import "@flaticon/flaticon-uicons/css/bold/rounded.css";
+@import "@flaticon/flaticon-uicons/css/bold/straight.css";
+@import "@flaticon/flaticon-uicons/css/solid/rounded.css";
+@import "@flaticon/flaticon-uicons/css/solid/straight.css";
