@@ -12,12 +12,17 @@ export class PagosService {
   private firestore = inject(Firestore);
   private auth = inject(Auth);
 
+  private readonly coleccion_local = 'gastos';
+  private readonly coleccion_foranea = 'plantillas';
+
   //user$ = user(this.auth);
   usuario = toSignal(user(this.auth), { initialValue: null });
 
-  private pagosCollection = collection(this.firestore, 'gastos');
+  private pagosCollection = collection(this.firestore, this.coleccion_local);
   private categoriaCollection = collection(this.firestore, 'categorias');
   private estadoCollection = collection(this.firestore, 'estados');
+
+  //estados = toSignal(this.getEstados(), { initialValue: [] });
 
   /* constructor() {
     effect(() => {
@@ -26,6 +31,8 @@ export class PagosService {
   } */
 
   getPagosDelUsuario(mes: number, anho: number): Observable<any[]> {
+    //const estPendiente = this.estados().find(e => e.nombre === 'Sin empezar');
+
     return user(this.auth).pipe(
       switchMap(currentUser => {
         if (!currentUser) return of([]); // Si no hay usuario, lista vacía
@@ -35,24 +42,6 @@ export class PagosService {
           collection(this.firestore, `users/${currentUser.uid}/gastos`),
           where('mes', '==', mes),
           where('anho', '==', anho),
-          orderBy('dia_vencimiento', 'asc')
-        );
-        return collectionData(q, { idField: 'id' });
-      })
-    );
-  }
-
-
-  getPlantillas(activo: boolean): Observable<any[]> {
-    return user(this.auth).pipe(
-      switchMap(currentUser => {
-        if (!currentUser) return of([]); // Si no hay usuario, lista vacía
-        console.log('Usuario actual en getPlantillas():', currentUser.uid);
-
-        const q = query(
-          collection(this.firestore, `users/${currentUser.uid}/plantillas`),
-          where('activo', '==', activo),
-          //where('anho', '==', anho),
           orderBy('dia_vencimiento', 'asc')
         );
         return collectionData(q, { idField: 'id' });
@@ -85,25 +74,7 @@ export class PagosService {
     });
   }
 
-  async crearPlantilla(templateData: { notas: string, estado: string, esFijo: string, concepto: string, anho: number, mes: number, monto_estimado: string, monto_pagado: number, dia_vencimiento: number, fecha_pago: string, categoria: string }) {
-    const templatesRef = collection(this.firestore, `users/${this.usuario()?.uid}/plantillas`);
 
-    await addDoc(templatesRef, {
-      anho: templateData.anho,
-      mes: templateData.mes,
-      concepto: templateData.concepto,
-      monto_estimado: templateData.monto_estimado,
-      monto_pagado: templateData.monto_pagado,
-      dia_vencimiento: templateData.dia_vencimiento,
-      fecha_pago: templateData.fecha_pago,
-      notas: templateData.notas,
-      estado: templateData.estado,
-      categoria: templateData.categoria,
-      esFijo: templateData.esFijo,
-      activo: true,
-      fecha_creacion: serverTimestamp()
-    });
-  }
 
   async createDoc(payload: any, target: string): Promise<void> {
     const templatesRef = collection(this.firestore, `users/${this.usuario()?.uid}/${target}`);
@@ -176,7 +147,7 @@ export class PagosService {
   }
 
   //Copia Documento exactamente igual
-  async copiarDocumento(source: string, target: string,templateId: string, targetMonth: string): Promise<void> {
+  async copiarDocumento(source: string, target: string, templateId: string, targetMonth: string): Promise<void> {
     try {
       console.log(`Iniciando copia desde ${source} ${templateId} hacia ${target} para el mes ${targetMonth}`);
       // 1. Apuntar y obtener el documento de la plantilla origen
@@ -204,10 +175,10 @@ export class PagosService {
     }
   }
 
-  async copiarPlantilla(origen: string, destino: string, templateId: string, mes: string, anho: string): Promise<void> {
+  async copiarPlantilla(origen: string, destino: string, templateId: string, mes: number, anho: number): Promise<void> {
     const targetMonth = `${anho}-${mes}`; // Formato YYYY-MM
     try {
-      console.log(`Iniciando copia de plantilla ${templateId} para el mes ${targetMonth}`);
+      console.log(`Iniciando copia de plantilla ${templateId} para el mes ${targetMonth} desde ${origen} hacia ${destino}`);
       // 1. Apuntar y obtener el documento de la plantilla origen
       const templateDocRef = doc(this.firestore, `users/${this.usuario()?.uid}/${origen}/${templateId}`);
       const templateSnap = await getDoc(templateDocRef);
@@ -242,7 +213,7 @@ export class PagosService {
     }
   }
 
-  async deleteTemplate(target: string, templateId: string): Promise<void> {
+  async deleteDoc(target: string, templateId: string): Promise<void> {
     console.log('Intentando eliminar plantilla con ID:', templateId);
     if (!templateId) {
       throw new Error('Se requiere un ID válido para eliminar la plantilla.');

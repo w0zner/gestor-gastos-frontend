@@ -1,1 +1,46 @@
-<p>estados-form-component works!</p>
+@if (isOpen()) {
+<dialog #dialog id="my_modal_3" class="modal animate__animated animate__fadeIn">
+    <div class="modal-box w-11/12 max-w-2xl">
+        <form method="dialog">
+            <button class="btn btn-sm  absolute right-2 top-2" (click)="onClose()">✕</button>
+        </form>
+        <form [formGroup]="form" (ngSubmit)="onSubmit()" method="dialog">
+            <div>
+                <h3 class="font-bold text-lg">Agregar Plantilla</h3>
+                <div class="divider"></div>
+                <div class="flex row space-x-2 mb-2">
+                    <div class="form-control w-full max-w-xs">
+                        <label class="label">
+                            <span class="label-text">Nombre <span class="text-error">*</span></span>
+                        </label>
+                        <input type="text" formControlName="nombre" placeholder="Nombre"
+                            class="input input-bordered w-full max-w-xs" />
+                    </div>
+
+                    <div class="form-control w-full max-w-xs">
+                        <label class="label">
+                            <span class="label-text">Color <span class="text-error">*</span></span>
+                        </label>
+                        <input type="color" formControlName="color" placeholder="Color"
+                            class="input input-bordered w-full max-w-xs" />
+                    </div>
+                </div>
+
+
+                <div class="divider"></div>
+
+                <div class="flex justify-end space-x-2">
+                    <button class="btn btn-neutral" (click)="onClose()">
+                        <i class="fi fi-rr-ban"></i>
+                        Cancelar
+                    </button>
+                    <button class="btn btn-primary" type="submit" [disabled]="!canSubmit()">
+                        <i class="fi fi-br-check"></i>Guardar
+                    </button>
+                </div>
+
+            </div>
+        </form>
+    </div>
+</dialog>
+}

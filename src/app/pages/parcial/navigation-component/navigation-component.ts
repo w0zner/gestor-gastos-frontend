@@ -7,7 +7,6 @@ import { Router, RouterLink } from '@angular/router';
 @Component({
   selector: 'app-navigation-component',
   imports: [
-    RouterLink,
     NgIf,
     AsyncPipe
   ],

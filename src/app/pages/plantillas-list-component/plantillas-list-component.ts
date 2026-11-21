@@ -6,6 +6,8 @@ import { Auth, user } from '@angular/fire/auth';
 import { CurrencyPipe, DatePipe, NgClass } from '@angular/common';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { PlantillasFormComponent } from '../plantillas-form-component/plantillas-form-component';
+import { PlantillasService } from '../../services/plantillas-service';
+import { SidebarService } from '../../services/sidebar-service';
 
 
 interface Pago {
@@ -30,11 +32,17 @@ interface Pago {
   selector: 'app-plantillas-list-component',
   templateUrl: './plantillas-list-component.html',
   styleUrl: './plantillas-list-component.css',
-  imports: [DatePipe, ReactiveFormsModule, CurrencyPipe, RouterLink, PlantillasFormComponent]
+  imports: [DatePipe, ReactiveFormsModule, CurrencyPipe, PlantillasFormComponent]
 })
 export class PlantillasListComponent {
   private pagosService = inject(PagosService);
+  private plantillasService = inject(PlantillasService);
   private auth = inject(Auth);
+  sidebarService = inject(SidebarService);
+
+
+  private readonly coleccion_local = 'plantillas';
+  private readonly coleccion_foranea = 'gastos';
 
   usuario = toSignal(user(this.auth), { initialValue: null });
 
@@ -43,7 +51,7 @@ export class PlantillasListComponent {
 
   listaPagos = signal<Pago[]>([]);
 
-  plantillasRaw = toSignal(this.pagosService.getPlantillas(true), { initialValue: [] });
+  plantillasRaw = toSignal(this.plantillasService.obtenerPlantillas(true), { initialValue: [] });
   categorias = toSignal(this.pagosService.getCategorias(), { initialValue: [] });
   estados = toSignal(this.pagosService.getEstados(), { initialValue: [] });
 
@@ -110,7 +118,7 @@ export class PlantillasListComponent {
   }
 
   async manejoGuardado(event: { id?: string; payload: Omit<Pago, 'id'> }) {
-    if(event.id) {
+    if (event.id) {
       console.log('Guardando cambios en el pago con ID:', event.id, 'con datos:', event.payload);
       await this.pagosService.updateDoc(event.id, event.payload, 'plantillas');
     } else {
@@ -125,7 +133,21 @@ export class PlantillasListComponent {
     const mesActual = new Date().getMonth() + 1;
     const anhoActual = new Date().getFullYear();
     const templateId = pago.id;
-    this.pagosService.copiarPlantilla('plantillas', 'plantillas', templateId!, mesActual.toString(), anhoActual.toString())
+    this.pagosService.copiarPlantilla(this.coleccion_local, this.coleccion_local, templateId!, mesActual, anhoActual)
+      .then(() => {
+        console.log('Plantilla copiada con éxito');
+      })
+      .catch((error) => {
+        console.error('Error al copiar la plantilla:', error);
+      });
+  }
+
+  copiarToPagos(pago: Pago) {
+    console.log('Copiando registro de pago...');
+    const mesActual = new Date().getMonth() + 1;
+    const anhoActual = new Date().getFullYear();
+    const templateId = pago.id;
+    this.pagosService.copiarPlantilla(this.coleccion_local, this.coleccion_foranea, templateId!, mesActual, anhoActual)
       .then(() => {
         console.log('Plantilla copiada con éxito');
       })
@@ -141,7 +163,7 @@ export class PlantillasListComponent {
       return;
     }
 
-    this.pagosService.deleteTemplate('plantillas', pago.id)
+    this.pagosService.deleteDoc('plantillas', pago.id)
       .then(() => {
         console.log(`Plantilla con ID ${pago.id} eliminada con éxito.`);
       })

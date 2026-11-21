@@ -5,15 +5,34 @@
 <div class="grid grid-cols-12 gap-4 p-4 min-h-[calc(100vh-80px)] bg-base-300">
 
   <!-- Contenido Principal que cambia con las rutas (Ocupa 8 columnas o 12 en móviles) -->
-  <main class="col-span-12 md:col-span-12 bg-base-100 border border-base-300 p-6 rounded-box shadow-sm">
+  <main class="col-span-12 md:col-span-10 bg-base-100 border border-base-300 p-6 rounded-box shadow-sm"
+    [class]="sidebarService.isOpen() ? 'md:col-span-10' : 'md:col-span-12'">
     <router-outlet></router-outlet>
   </main>
 
   <!-- Opcional: Una barra lateral o panel derecho (Ocupa las 4 columnas restantes) -->
-  <!-- <aside class="col-span-12 md:col-span-4 bg-base-200 p-6 rounded-box">
-    <h3 class="font-bold text-lg mb-2">Panel Lateral</h3>
-    <p class="text-sm opacity-75">Aquí puedes poner un resumen, perfil de usuario o accesos rápidos.</p>
-  </aside> -->
+
+  <aside class="col-span-12 md:col-span-2 bg-base-200 p-6 rounded-box animate__animated animate__fadeIn"
+    [class.hidden]="!sidebarService.isOpen()">
+
+    <div class="flex justify-between">
+      <h3 class="font-bold text-lg mb-2">Panel</h3>
+      <button type="button" style="cursor: pointer;" (click)="sidebarService.close()">✕</button>
+    </div>
+
+    <!-- <p class="text-sm opacity-75">Aquí puedes poner un resumen, perfil de usuario o accesos rápidos.</p> -->
+    <ul class="menu bg-base-200 rounded-box w-56">
+      <li><a routerLink="/inicio/pagos" routerLinkActive="menu-active"><i class="fi fi-br-document"></i>Pagos</a></li>
+      <li><a routerLink="/inicio/plantillas" routerLinkActive="menu-active"><i class="fi fi-br-eye"></i>Plantillas</a>
+      </li>
+      <li><a routerLink="/inicio/categorias" routerLinkActive="menu-active"><i class=" fi fi-br-file"></i>Categorías</a>
+      </li>
+      <li><a routerLink="/inicio/estados" routerLinkActive="menu-active"><i class="fi fi-br-folder"></i>Estados</a>
+      </li>
+    </ul>
+  </aside>
+
+
 
 </div>
 

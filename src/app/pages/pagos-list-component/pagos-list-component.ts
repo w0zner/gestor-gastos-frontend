@@ -1,4 +1,4 @@
-import { Component, computed, effect, inject, signal } from '@angular/core';
+import { Component, computed, effect, inject, output, signal } from '@angular/core';
 import { PagosService } from '../../services/pagos-service';
 import { Auth, user } from '@angular/fire/auth';
 import { Router, RouterLink } from '@angular/router';
@@ -7,6 +7,7 @@ import { collection, Firestore } from 'firebase/firestore';
 import { collectionData } from '@angular/fire/firestore';
 import { forkJoin } from 'rxjs';
 import { toSignal } from '@angular/core/rxjs-interop';
+import { SidebarService } from '../../services/sidebar-service';
 
 interface Pago {
   id?: string;
@@ -30,24 +31,29 @@ interface Pago {
   selector: 'app-pagos-list-component',
   templateUrl: './pagos-list-component.html',
   styleUrl: './pagos-list-component.css',
-  imports: [DatePipe, CurrencyPipe, RouterLink]
+  imports: [CurrencyPipe]
 })
 export class PagosListComponent {
   private pagosService = inject(PagosService);
   private router = inject(Router);
   private auth = inject(Auth);
+  sidebarService = inject(SidebarService);
 
-
+  private readonly coleccion_local = 'gastos';
+  private readonly coleccion_foranea = 'plantillas';
 
   usuario = toSignal(user(this.auth), { initialValue: null });
 
-  categoriasMap: { [key: string]: any } = {};
-  estadosMap: { [key: string]: any } = {};
+  mesActual = new Date().getMonth() + 1;
+  anhoActual = new Date().getFullYear();
+
+  //categoriasMap: { [key: string]: any } = {};
+  //estadosMap: { [key: string]: any } = {};
 
   listaPagos = signal<Pago[]>([]);
   cantidadPagos = signal(0);
 
-  pagosRaw = toSignal(this.pagosService.getPagosDelUsuario(11, 2026), { initialValue: [] });
+  pagosRaw = toSignal(this.pagosService.getPagosDelUsuario(this.mesActual, this.anhoActual), { initialValue: [] });
   categorias = toSignal(this.pagosService.getCategorias(), { initialValue: [] });
   estados = toSignal(this.pagosService.getEstados(), { initialValue: [] });
 
@@ -126,5 +132,20 @@ export class PagosListComponent {
       });
   }
 
+  eliminar(pago: Pago) {
+    console.log('Eliminando plantilla con ID:', pago.id);
+    if (!pago.id) {
+      console.error('No se puede eliminar la plantilla: ID no definido.');
+      return;
+    }
+
+    this.pagosService.deleteDoc(this.coleccion_local, pago.id)
+      .then(() => {
+        console.log(`Plantilla con ID ${pago.id} eliminada con éxito.`);
+      })
+      .catch((error) => {
+        console.error('Error al eliminar la plantilla:', error);
+      });
+  }
 
 }

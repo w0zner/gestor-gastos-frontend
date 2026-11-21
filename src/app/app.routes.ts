@@ -5,6 +5,8 @@ import { InicioComponent } from './pages/parcial/inicio-component/inicio-compone
 import { AuthGuard, redirectUnauthorizedTo } from '@angular/fire/auth-guard';
 import { PlantillasListComponent } from './pages/plantillas-list-component/plantillas-list-component';
 import { PlantillasFormComponent } from './pages/plantillas-form-component/plantillas-form-component';
+import { CategoriasListComponent } from './pages/categorias-list-component/categorias-list-component';
+import { EstadosListComponent } from './pages/estados-list-component/estados-list-component';
 export const routes: Routes = [
   { path: 'auth', component: AuthComponent },
 
@@ -16,9 +18,10 @@ export const routes: Routes = [
     children: [
       { path: 'pagos', component: PagosListComponent },
       { path: 'plantillas', component: PlantillasListComponent },
-      { path: 'plantillas/:id', component: PlantillasFormComponent },
+      { path: 'categorias', component: CategoriasListComponent },
+      { path: 'estados', component: EstadosListComponent },
+      /*{ path: 'plantillas/:id', component: PlantillasFormComponent },*/
       { path: '', redirectTo: 'pagos', pathMatch: 'full' }, // Por defecto muestra pagos
-      // { path: 'categorias', component: CategoriasComponent }
     ]
   },
 

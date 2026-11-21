@@ -1,1 +1,64 @@
-<p>categorias-list-component works!</p>
+<div class="overflow-x-auto animate__animated animate__fadeIn">
+    <header class="flex justify-between items-center w-full">
+        <h4 class="font-bold text-lg mb-2">Categorías
+        </h4>
+        <div class="space-x-2">
+            <button class="btn btn-neutral" (click)="openCreateModal()">
+                <i class="fi fi-br-plus"></i>
+                Agregar
+            </button>
+            <button class="btn btn-neutral" (click)="sidebarService.toggle()">
+                <i class="fi fi-bs-list"></i>
+            </button>
+        </div>
+    </header>
+    <div class="divider"></div>
+    <div class="overflow-x-auto">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Nombre</th>
+                    <th>Color</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                @for (item of categorias(); track item.id) {
+                <tr [style.background-color]="item.colorEstado">
+                    <td>{{item.id}}</td>
+                    <td><b>{{item.nombre}}</b></td>
+                    <td>{{item.color}}</td>
+                    <td>
+                        <div class="flex space-x-1">
+                            <div class="lg:tooltip" data-tip="Copiar aquí">
+                                <button class="btn btn-ghost" (click)="copiar(item)">
+                                    <i class="fi fi-rr-copy"></i>
+                                </button>
+                            </div>
+
+                            <div class="lg:tooltip" data-tip="Editar" (click)="openEditModal(item)">
+                                <button class="btn btn-ghost">
+                                    <i class="fi fi-rr-edit"></i>
+                                </button>
+                            </div>
+
+                            <div class="lg:tooltip" data-tip="Eliminar">
+                                <button class="btn btn-ghost" (click)="eliminar(item)">
+                                    <i class="fi fi-rr-trash text-red-600"></i>
+                                </button>
+                            </div>
+                        </div>
+                </tr>
+                } @empty {
+                <tr>
+                    <td colspan="6" class="text-center">No hay registros.</td>
+                </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <app-categorias-form-component [isOpen]="isModalOpen()" [item]="selectedItem()" (close)="closeModal()"
+        (save)="manejoGuardado($any($event))" />
+</div>
