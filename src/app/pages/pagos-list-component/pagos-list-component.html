@@ -8,10 +8,12 @@
                 <i class="fi fi-ss-eye"></i>
                 Ver plantillas
             </a> -->
-            <button class="btn btn-neutral" (click)="inicializarMesGastos()">
-                <i class="fi fi-bs-sign-in-alt"></i>
-                Inicializar mes
-            </button>
+
+            <div class="lg:tooltip" data-tip="Inicializar gastos del mes">
+                <button class="btn btn-neutral" (click)="inicializarMesGastos()">
+                    <i class="fi fi-bs-sign-in-alt"></i>
+                </button>
+            </div>
             <button class="btn btn-neutral" (click)="sidebarService.toggle()">
                 <i class="fi fi-bs-list"></i>
             </button>
