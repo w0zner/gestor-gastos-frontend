@@ -29,7 +29,7 @@
         <table class="table">
             <thead>
                 <tr>
-                    <th>ID</th>
+                    <!-- <th>ID</th> -->
                     <th>Concepto</th>
                     <th>Día</th>
                     <th>Categoría</th>
@@ -42,7 +42,7 @@
             <tbody>
                 @for (pago of pagos(); track pago.id) {
                 <tr [style.background-color]="pago.colorEstado">
-                    <td>{{pago.id}}</td>
+                    <!-- <td>{{pago.id}}</td> -->
                     <td><b>{{pago.concepto}}</b></td>
                     <td>{{pago.dia_vencimiento}}</td>
                     <td>

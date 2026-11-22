@@ -3,15 +3,16 @@
         <h4 class="font-bold text-lg mb-2">Mis Pagos <div class="badge badge-ghost badge-outline">{{ pagos().length }}
             </div>
         </h4>
-        <div class="space-x-2">
+        <div class="flex space-x-2">
             <!--  <a role="button" class="btn btn-neutral" routerLink="/inicio/plantillas">
                 <i class="fi fi-ss-eye"></i>
                 Ver plantillas
             </a> -->
 
-            <div class="lg:tooltip" data-tip="Inicializar gastos del mes">
-                <button class="btn btn-neutral" (click)="inicializarMesGastos()">
+            <div class="tooltip tooltip-bottom" data-tip="Inicializar mes">
+                <button class="btn btn-neutral" (click)="inicializarMesGastos()" aria-label="Inicializar mes">
                     <i class="fi fi-bs-sign-in-alt"></i>
+                    <span class="hidden sm:inline">Inicializar mes</span>
                 </button>
             </div>
             <button class="btn btn-neutral" (click)="sidebarService.toggle()">
@@ -39,7 +40,7 @@
         <table class="table">
             <thead>
                 <tr>
-                    <th>ID</th>
+                    <!-- <th>ID</th> -->
                     <th>Concepto</th>
                     <th>Día</th>
                     <th>Categoría</th>
@@ -57,7 +58,7 @@
                 </tr> -->
                 @for (pago of pagos(); track pago.id) {
                 <tr [style.background-color]="pago.colorEstado">
-                    <td>{{pago.id}}</td>
+                    <!-- <td>{{pago.id}}</td> -->
                     <td><b>{{pago.concepto}}</b></td>
                     <td>{{pago.dia_vencimiento}}</td>
                     <td>
