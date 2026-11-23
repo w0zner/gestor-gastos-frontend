@@ -36,12 +36,13 @@
                     <th>Monto Estimado</th>
                     <th>Fecha de Creación</th>
                     <th>Estado</th>
+                    <th>Activo</th>
                     <th>Acciones</th>
                 </tr>
             </thead>
             <tbody>
                 @for (pago of pagos(); track pago.id) {
-                <tr [style.background-color]="pago.colorEstado">
+                <tr [style.background-color]="pago.activo === false ? '#cccccc' : pago.colorEstado">
                     <!-- <td>{{pago.id}}</td> -->
                     <td><b>{{pago.concepto}}</b></td>
                     <td>{{pago.dia_vencimiento}}</td>
@@ -56,6 +57,7 @@
                             {{pago.nombreEstado}}
                         </div>
                     </td>
+                    <td>{{pago.activo}}</td>
                     <td>
                         <div class="flex space-x-1">
                             <div class="lg:tooltip" data-tip="Enviar a Lista de pagos">

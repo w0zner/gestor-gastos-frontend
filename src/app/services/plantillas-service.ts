@@ -29,7 +29,7 @@ export class PlantillasService {
 
         const q = query(
           collection(this.firestore, `users/${currentUser.uid}/${this.coleccion_local}`),
-          where('activo', '==', activo),
+          //where('activo', '==', activo),
           //where('anho', '==', anho),
           orderBy('dia_vencimiento', 'asc')
         );
