@@ -5,23 +5,7 @@
 <div class="relative p-2 sm:p-4 min-h-[calc(100vh-68px)] bg-base-300">
   <div class="grid grid-cols-12 gap-4">
 
-    <!-- Contenido Principal -->
-    <main
-      class="col-span-12 bg-base-100 border border-base-300 p-3 sm:p-6 rounded-box shadow-sm transition-all duration-300"
-      [class]="sidebarService.isOpen() ? 'md:col-span-9 lg:col-span-10' : 'md:col-span-12'">
-      <router-outlet></router-outlet>
-    </main>
-
-    <!-- Backdrop oscuro solo en mobile cuando el panel está abierto -->
-    @if (sidebarService.isOpen()) {
-      <div
-        class="fixed inset-0 bg-black/50 backdrop-blur-xs z-40 md:hidden transition-opacity"
-        (click)="sidebarService.close()"
-        aria-label="Cerrar panel">
-      </div>
-    }
-
-    <!-- Panel lateral (Drawer en mobile, columna fija en desktop) -->
+        <!-- Panel lateral (Drawer en mobile, columna fija en desktop) -->
     <aside
       class="bg-base-200 transition-all duration-300 z-50
              fixed top-0 right-0 h-full w-72 p-6 shadow-2xl flex flex-col
@@ -63,6 +47,24 @@
         </li>
       </ul>
     </aside>
+
+    <!-- Contenido Principal -->
+    <main
+      class="col-span-12 bg-base-100 border border-base-300 p-3 sm:p-6 rounded-box shadow-sm transition-all duration-300"
+      [class]="sidebarService.isOpen() ? 'md:col-span-9 lg:col-span-10' : 'md:col-span-12'">
+      <router-outlet></router-outlet>
+    </main>
+
+    <!-- Backdrop oscuro solo en mobile cuando el panel está abierto -->
+    @if (sidebarService.isOpen()) {
+      <div
+        class="fixed inset-0 bg-black/50 backdrop-blur-xs z-40 md:hidden transition-opacity"
+        (click)="sidebarService.close()"
+        aria-label="Cerrar panel">
+      </div>
+    }
+
+
 
   </div>
 </div>

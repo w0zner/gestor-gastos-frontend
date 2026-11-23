@@ -19,9 +19,9 @@
                 <i class="fi fi-br-plus"></i>
                 Agregar
             </button>
-            <button class="btn btn-neutral" (click)="sidebarService.toggle()">
+            <!-- <button class="btn btn-neutral" (click)="sidebarService.toggle()">
                 <i class="fi fi-bs-list"></i>
-            </button>
+            </button> -->
         </div>
     </header>
     <div class="divider"></div>
@@ -46,13 +46,13 @@
                     <td><b>{{pago.concepto}}</b></td>
                     <td>{{pago.dia_vencimiento}}</td>
                     <td>
-                        <div class="badge badge-soft" [style.background-color]="pago.colorCategoria">
+                        <div class="badge badge-soft whitespace-nowrap" [style.background-color]="pago.colorCategoria">
                             {{pago.nombreCategoria}}</div>
                     </td>
                     <td>{{pago.monto_estimado | currency:'Gs. ':'symbol':'1.0-0'}}</td>
                     <td>{{pago.fecha_creacion | date :'dd/MM/yyyy'}}</td>
                     <td>
-                        <div class="badge badge-soft" [style.background-color]="pago.colorEstado">
+                        <div class="badge badge-soft whitespace-nowrap" [style.background-color]="pago.colorEstado">
                             {{pago.nombreEstado}}
                         </div>
                     </td>

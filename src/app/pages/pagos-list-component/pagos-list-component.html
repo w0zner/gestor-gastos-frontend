@@ -15,9 +15,9 @@
                     <span class="hidden sm:inline">Inicializar mes</span>
                 </button>
             </div>
-            <button class="btn btn-neutral" (click)="sidebarService.toggle()">
+<!--             <button class="btn btn-neutral" (click)="sidebarService.toggle()">
                 <i class="fi fi-bs-list"></i>
-            </button>
+            </button> -->
 
             <!-- <button class="btn btn-neutral" (click)="copiar()">
                 <i class="fi fi-br-plus"></i>
@@ -25,6 +25,20 @@
             </button> -->
         </div>
     </header>
+
+    <!-- Conteo de estados y cantidades -->
+    <div class="flex flex-wrap items-center gap-2 mt-2">
+        @for (item of conteoPorEstado(); track item.id) {
+          @if(item.nombre === 'Sin empezar' || item.cantidad > 0) {
+            <div class="badge badge-soft whitespace-nowrap gap-1.5 px-3 py-1 text-xs sm:text-sm font-medium border border-base-300"
+              [style.background-color]="item.color">
+                <span>{{ item.nombre }}:</span>
+                <span class="font-bold">{{ item.cantidad }}</span>
+            </div>
+          }
+        }
+    </div>
+
     <div class="divider"></div>
     <!--     <ul>
         @for (pago of listaPagos(); track pago.id) {
@@ -43,8 +57,8 @@
                     <!-- <th>ID</th> -->
                     <th>Concepto</th>
                     <th>Día</th>
-                    <th>Categoría</th>
-                    <th>Monto Estimado</th>
+                    <!-- <th>Categoría</th> -->
+                    <th class="hidden md:flex">Monto Estimado</th>
                     <th>Estado</th>
                     <th>Acciones</th>
                 </tr>
@@ -61,11 +75,11 @@
                     <!-- <td>{{pago.id}}</td> -->
                     <td><b>{{pago.concepto}}</b></td>
                     <td>{{pago.dia_vencimiento}}</td>
-                    <td>
+                    <!-- <td>
                         <div class="badge badge-soft" [style.background-color]="pago.colorCategoria">
                             {{pago.nombreCategoria}}</div>
-                    </td>
-                    <td class="flex justify-end">{{pago.monto_estimado | currency:'Gs. ':'symbol':'1.0-0'}}</td>
+                    </td> -->
+                    <td class="hidden md:flex justify-end">{{pago.monto_estimado | currency:'Gs. ':'symbol':'1.0-0'}}</td>
                     <td>
                         <!-- <div class="badge badge-soft" [style.background-color]="pago.colorEstado">{{pago.nombreEstado}}</div> -->
                         <select class="select select-sm select-neutral w-full max-w-xs"

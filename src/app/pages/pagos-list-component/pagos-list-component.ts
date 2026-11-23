@@ -78,7 +78,42 @@ export class PagosListComponent {
         nombreEstado: estMatch ? estMatch.nombre : 'Sin estado',
         colorEstado: estMatch ? estMatch.color : '#000000'
       };
+    })
+    .sort((a, b) => {
+      // 1. Si uno es "Sin empezar" y el otro no, priorizamos "Sin empezar"
+      const aEsSinEmpezar = a.nombreEstado === 'Sin empezar';
+      const bEsSinEmpezar = b.nombreEstado === 'Sin empezar';
+
+      if (aEsSinEmpezar && !bEsSinEmpezar) return -1;
+      if (!aEsSinEmpezar && bEsSinEmpezar) return 1;
+
+      // 2. Si ambos son "Sin empezar" (o ambos son de otro estado),
+      // ordenamos por día de vencimiento ascendente (1 al 31)
+      return (a.dia_vencimiento ?? 0) - (b.dia_vencimiento ?? 0);
     });
+  });
+
+  conteoPorEstado = computed(() => {
+    const listaPagos = this.pagos();
+    const listaEstados = this.estados();
+
+    if (!listaEstados.length) return [];
+
+    return listaEstados
+      .map((estado: any) => {
+        const cantidad = listaPagos.filter(p => p.nombreEstado === estado.nombre || p.estado?.id === estado.id).length;
+        return {
+          id: estado.id,
+          nombre: estado.nombre,
+          color: estado.color,
+          cantidad
+        };
+      })
+      .sort((a, b) => {
+        if (a.nombre === 'Sin empezar') return -1;
+        if (b.nombre === 'Sin empezar') return 1;
+        return a.nombre.localeCompare(b.nombre);
+      });
   });
 
 
