@@ -1,10 +1,11 @@
-import { computed, effect, inject, Injectable } from '@angular/core';
+import { computed, effect, inject, Injectable, Type } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { Auth, user } from '@angular/fire/auth';
 import { collectionData, Firestore } from '@angular/fire/firestore';
 import { addDoc, collection, deleteDoc, doc, getDoc, getDocs, orderBy, query, serverTimestamp, updateDoc, where, writeBatch } from 'firebase/firestore';
 import { Observable, of, switchMap } from 'rxjs';
 import { ToastService } from './toast-service';
+import { buildResponse, OperationResponse, TypeResponse } from '../interfaces/operation-response';
 
 @Injectable({
   providedIn: 'root',
@@ -12,7 +13,7 @@ import { ToastService } from './toast-service';
 export class PagosService {
   private firestore = inject(Firestore);
   private auth = inject(Auth);
-  toastService=inject(ToastService);
+  toastService = inject(ToastService);
 
   private readonly coleccion_local = 'gastos';
   private readonly coleccion_foranea = 'plantillas';
@@ -69,7 +70,6 @@ export class PagosService {
     const pagoRef = doc(this.firestore, `users/${this.usuario()?.uid}/gastos/${pagoId}`);
 
     const estadoRef = doc(this.firestore, `estados/${nuevoEstadoId}`);
-    //const referenciaEstado = `estados/${nuevoEstadoId}`;
 
     await updateDoc(pagoRef, {
       estado: estadoRef
@@ -78,33 +78,37 @@ export class PagosService {
 
 
 
-  async createDoc(payload: any, target: string): Promise<void> {
+  async createDoc(payload: any, target: string): Promise<OperationResponse> {
     const templatesRef = collection(this.firestore, `users/${this.usuario()?.uid}/${target}`);
     const estadoRef = doc(this.firestore, `estados/${payload.estado}`);
     const categoriaRef = doc(this.firestore, `categorias/${payload.categoria}`);
 
-    await addDoc(templatesRef, {
+    const docu = await addDoc(templatesRef, {
       ...payload,
       estado: estadoRef,
       categoria: categoriaRef,
       fecha_creacion: serverTimestamp()
     });
+
+    return buildResponse(TypeResponse.OK, `Registro guardado con éxito.`, docu);
   }
 
-  async updateDoc(id: string, payload: any, target: string): Promise<void> {
+  async updateDoc(id: string, payload: any, target: string): Promise<OperationResponse> {
     const ref = doc(this.firestore, `users/${this.usuario()?.uid}/${target}/${id}`);
     const estadoRef = doc(this.firestore, `estados/${payload.estado}`);
     const categoriaRef = doc(this.firestore, `categorias/${payload.categoria}`);
 
-    await updateDoc(ref, {
+    const docu = await updateDoc(ref, {
       ...payload,
       estado: estadoRef,
       categoria: categoriaRef
     });
+
+    return buildResponse(TypeResponse.OK, `Registro actualizado con éxito.`, docu);
   }
 
 
-  async inicializarMesGastos(): Promise<string> {
+  async inicializarMesGastos(): Promise<OperationResponse> {
     const mesActual = new Date().getMonth() + 1;
     const anhoActual = new Date().getFullYear();
     const expensesRef = collection(this.firestore, `users/${this.usuario()?.uid}/gastos`);
@@ -118,17 +122,14 @@ export class PagosService {
     const existingSnap = await getDocs(q);
 
     if (!existingSnap.empty) {
-      //console.log('Los gastos fijos de este mes ya fueron inicializados.');
-      //this.toastService.error('Los gastos fijos de este mes ya fueron inicializados.');
-      const mensaje = 'Los gastos fijos de este mes ya fueron inicializados.';
-      return mensaje;
+      return buildResponse(TypeResponse.ERROR, 'Los gastos fijos ya fueron inicializados este mes.');
     }
 
     // 2. Obtener las plantillas activas
     const templatesRef = collection(this.firestore, `users/${this.usuario()?.uid}/plantillas`);
     const templatesSnap = await getDocs(query(templatesRef, where('activo', '==', true)));
 
-    if (templatesSnap.empty) return 'No hay plantillas activas para inicializar.';
+    if (templatesSnap.empty) return buildResponse(TypeResponse.WARNING, 'No hay plantillas activas para inicializar.');
 
     // 3. Crear las instancias usando un batch para eficiencia atómica
     const batch = writeBatch(this.firestore);
@@ -147,8 +148,7 @@ export class PagosService {
     });
 
     await batch.commit();
-    console.log('Gastos fijos del mes inicializados con éxito.');
-    return 'Gastos fijos del mes inicializados con éxito.';
+    return buildResponse(TypeResponse.OK, 'Gastos fijos del mes inicializados con éxito.');
   }
 
   //Copia Documento exactamente igual
@@ -180,7 +180,7 @@ export class PagosService {
     }
   }
 
-  async copiarPlantilla(origen: string, destino: string, templateId: string, mes: number, anho: number): Promise<void> {
+  async copiarPlantilla(origen: string, destino: string, templateId: string, mes: number, anho: number): Promise<OperationResponse> {
     const targetMonth = `${anho}-${mes}`; // Formato YYYY-MM
     try {
       console.log(`Iniciando copia de plantilla ${templateId} para el mes ${targetMonth} desde ${origen} hacia ${destino}`);
@@ -210,7 +210,9 @@ export class PagosService {
       // 4. Guardar como un nuevo documento con ID automático en expenses
       await addDoc(documentRef, newExpensePayload);
 
-      console.log(`Plantilla copiada exitosamente de ${origen} a ${destino} para el mes ${targetMonth}`);
+      const mensaje = `Plantilla copiada exitosamente de ${origen} a ${destino} para el mes ${targetMonth}`
+      console.log(mensaje);
+      return buildResponse(TypeResponse.OK, mensaje)
 
     } catch (error) {
       console.error('Error al copiar la plantilla:', error);
@@ -218,14 +220,16 @@ export class PagosService {
     }
   }
 
-  async deleteDoc(target: string, templateId: string): Promise<void> {
-    console.log('Intentando eliminar plantilla con ID:', templateId);
-    if (!templateId) {
+  async deleteDoc(target: string, id: string | undefined): Promise<OperationResponse> {
+
+    if (!id) {
       throw new Error('Se requiere un ID válido para eliminar la plantilla.');
     }
 
-    const docRef = doc(this.firestore, `users/${this.usuario()?.uid}/${target}/${templateId}`);
+    const docRef = doc(this.firestore, `users/${this.usuario()?.uid}/${target}/${id}`);
     await deleteDoc(docRef);
+
+    return buildResponse(TypeResponse.OK, `Plantilla con ID ${id} eliminada con éxito.`);
   }
 }
 

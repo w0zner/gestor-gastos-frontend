@@ -9,24 +9,8 @@ import { forkJoin } from 'rxjs';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { SidebarService } from '../../services/sidebar-service';
 import { ToastService } from '../../services/toast-service';
-
-interface Pago {
-  id?: string;
-  anho: number;
-  mes: number;
-  concepto: string;
-  monto_estimado: number;
-  monto_pagado: number;
-  dia_vencimiento: number;
-  fecha_pago: any;
-  notas: string;
-  estado: string;
-  categoria: string;
-  esFijo: boolean;
-  templateId?: string;
-  activo: boolean;
-  fecha_creacion: string;
-}
+import { Pago } from '../../interfaces/pago';
+import { TypeResponse } from '../../interfaces/operation-response';
 
 @Component({
   selector: 'app-pagos-list-component',
@@ -81,18 +65,18 @@ export class PagosListComponent {
         colorEstado: estMatch ? estMatch.color : '#000000'
       };
     })
-    .sort((a, b) => {
-      // 1. Si uno es "Sin empezar" y el otro no, priorizamos "Sin empezar"
-      const aEsSinEmpezar = a.nombreEstado === 'Sin empezar';
-      const bEsSinEmpezar = b.nombreEstado === 'Sin empezar';
+      .sort((a, b) => {
+        // 1. Si uno es "Sin empezar" y el otro no, priorizamos "Sin empezar"
+        const aEsSinEmpezar = a.nombreEstado === 'Sin empezar';
+        const bEsSinEmpezar = b.nombreEstado === 'Sin empezar';
 
-      if (aEsSinEmpezar && !bEsSinEmpezar) return -1;
-      if (!aEsSinEmpezar && bEsSinEmpezar) return 1;
+        if (aEsSinEmpezar && !bEsSinEmpezar) return -1;
+        if (!aEsSinEmpezar && bEsSinEmpezar) return 1;
 
-      // 2. Si ambos son "Sin empezar" (o ambos son de otro estado),
-      // ordenamos por día de vencimiento ascendente (1 al 31)
-      return (a.dia_vencimiento ?? 0) - (b.dia_vencimiento ?? 0);
-    });
+        // 2. Si ambos son "Sin empezar" (o ambos son de otro estado),
+        // ordenamos por día de vencimiento ascendente (1 al 31)
+        return (a.dia_vencimiento ?? 0) - (b.dia_vencimiento ?? 0);
+      });
   });
 
   conteoPorEstado = computed(() => {
@@ -122,9 +106,9 @@ export class PagosListComponent {
   constructor() {
     effect(() => {
       // Esto se disparará dos veces: primero con [] y luego con los datos reales cuando lleguen de Firebase
-      console.log('Datos actuales de la señal pagos():', this.pagosRaw());
-      console.log('Datos actuales de la señal categorias():', this.categorias());
-      console.log('Datos actuales de la señal estados():', this.estados());
+      //console.log('Datos actuales de la señal pagos():', this.pagosRaw());
+      //console.log('Datos actuales de la señal categorias():', this.categorias());
+      //console.log('Datos actuales de la señal estados():', this.estados());
 
       //effect(() => {
       console.log('Usuario actual:', this.usuario()?.uid);
@@ -135,52 +119,34 @@ export class PagosListComponent {
   async cambiarEstado(pagoId: string, event: Event) {
     const selectElement = event.target as HTMLSelectElement;
     const nuevoEstadoId = selectElement.value;
-    console.log(selectElement);
-    console.log(`Cambiando estado del pago ${pagoId} al nuevo estado ${nuevoEstadoId}`);
 
     try {
       await this.pagosService.actualizarEstadoPago(pagoId, nuevoEstadoId);
-      console.log('Estado actualizado con éxito en Firestore');
     } catch (error) {
       console.error('Error al actualizar el estado:', error);
+      this.toastService.error('Error al actualizar el estado: ' + error);
     }
-  }
-
-  copiar() {
-    console.log('Copiando plantilla...');
-    const templateId = 'nJVmNkzUxaaLcvJK3ppW';
-    const targetMonth = '2026-12'; // Formato YYYY-MM
-    this.pagosService.copiarDocumento('plantillas', 'gastos', templateId, targetMonth)
-      .then(() => {
-        console.log('Plantilla copiada con éxito');
-      })
-      .catch((error) => {
-        console.error('Error al copiar la plantilla:', error);
-      });
   }
 
   inicializarMesGastos() {
     this.pagosService.inicializarMesGastos()
       .then((response) => {
-        this.toastService.error('Los gastos fijos de este mes ya fueron inicializados.');
+        this.toastService.showFromResponse(response);
       })
       .catch((error) => {
         console.error('Error al copiar la plantilla:', error);
+        this.toastService.notify(TypeResponse.ERROR, 'Error al eliminar la plantilla ' + error);
+        this.toastService.error('Error al copiar la plantilla:' + error);
       });
   }
 
   eliminar(pago: Pago) {
-    console.log('Eliminando plantilla con ID:', pago.id);
-    if (!pago.id) {
-      console.error('No se puede eliminar la plantilla: ID no definido.');
-      return;
-    }
-
     this.pagosService.deleteDoc(this.coleccion_local, pago.id)
-      .then(() => {
-        console.log(`Plantilla con ID ${pago.id} eliminada con éxito.`);
+      .then((response) => {
+        this.toastService.showFromResponse(response);
       })
       .catch((error) => {
+        this.toastService.error('Error al eliminar el pago ' + error);
         console.error('Error al eliminar la plantilla:', error);
       });
   }

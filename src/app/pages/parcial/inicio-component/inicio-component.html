@@ -5,47 +5,33 @@
 <div class="relative p-2 sm:p-4 min-h-[calc(100vh-68px)] bg-base-300">
 
   @if(toastService.toasts().length > 0){
-    <div class="toast toast-top toast-end z-50">
+  <div class="toast toast-top toast-end z-50 animate__animated animate__fadeIn">
     @for (item of toastService.toasts(); track item.id) {
-      <div
-        class="alert shadow-md"
-        [class.alert-info]="item.type === 'info'"
-        [class.alert-success]="item.type === 'success'"
-        [class.alert-warning]="item.type === 'warning'"
-        [class.alert-error]="item.type === 'error'"
-      >
-        <span class="text-white">{{ item.message }}</span>
-        <button
-          type="button"
-          class="btn btn-xs btn-ghost text-white"
-          [class.hover:text-red-400]="item.type === 'error'"
-          [class.hover:text-yellow-400]="item.type === 'warning'"
-          [class.hover:text-green-400]="item.type === 'success'"
-          [class.hover:text-blue-400]="item.type === 'info'"
-          (click)="toastService.dismiss(item.id)"
-        >
-          ✕
-        </button>
-      </div>
+    <div class="alert shadow-md" [class.alert-info]="item.type === 'info'"
+      [class.alert-success]="item.type === 'success'" [class.alert-warning]="item.type === 'warning'"
+      [class.alert-error]="item.type === 'error'">
+      <span class="text-white">{{ item.message }}</span>
+      <button type="button" class="btn btn-xs btn-ghost text-white" [class.hover:text-red-400]="item.type === 'error'"
+        [class.hover:text-yellow-400]="item.type === 'warning'" [class.hover:text-green-400]="item.type === 'success'"
+        [class.hover:text-blue-400]="item.type === 'info'" (click)="toastService.dismiss(item.id)">
+        ✕
+      </button>
+    </div>
     }
   </div>
   }
 
   <div class="grid grid-cols-12 gap-4">
 
-        <!-- Panel lateral (Drawer en mobile, columna fija en desktop) -->
-    <aside
-      class="bg-base-200 transition-all duration-300 z-50
+    <!-- Panel lateral (Drawer en mobile, columna fija en desktop) -->
+    <aside class="bg-base-200 transition-all duration-300 z-50
              fixed top-0 right-0 h-full w-72 p-6 shadow-2xl flex flex-col
              md:static md:w-auto md:h-auto md:z-auto md:shadow-none md:p-6 md:rounded-box md:col-span-3 lg:col-span-2"
       [class.hidden]="!sidebarService.isOpen()">
 
       <div class="flex justify-between items-center pb-3 border-b border-base-300 mb-4">
         <h3 class="font-bold text-lg">Panel</h3>
-        <button
-          type="button"
-          class="btn btn-ghost btn-circle btn-sm"
-          (click)="sidebarService.close()"
+        <button type="button" class="btn btn-ghost btn-circle btn-sm" (click)="sidebarService.close()"
           aria-label="Cerrar panel">
           ✕
         </button>
@@ -59,17 +45,20 @@
           </a>
         </li>
         <li>
-          <a routerLink="/inicio/plantillas" routerLinkActive="menu-active" (click)="sidebarService.close()" class="py-2.5">
+          <a routerLink="/inicio/plantillas" routerLinkActive="menu-active" (click)="sidebarService.close()"
+            class="py-2.5">
             <i class="fi fi-br-eye text-base"></i>Plantillas
           </a>
         </li>
         <li>
-          <a routerLink="/inicio/categorias" routerLinkActive="menu-active" (click)="sidebarService.close()" class="py-2.5">
+          <a routerLink="/inicio/categorias" routerLinkActive="menu-active" (click)="sidebarService.close()"
+            class="py-2.5">
             <i class="fi fi-br-file text-base"></i>Categorías
           </a>
         </li>
         <li>
-          <a routerLink="/inicio/estados" routerLinkActive="menu-active" (click)="sidebarService.close()" class="py-2.5">
+          <a routerLink="/inicio/estados" routerLinkActive="menu-active" (click)="sidebarService.close()"
+            class="py-2.5">
             <i class="fi fi-br-folder text-base"></i>Estados
           </a>
         </li>
@@ -85,11 +74,9 @@
 
     <!-- Backdrop oscuro solo en mobile cuando el panel está abierto -->
     @if (sidebarService.isOpen()) {
-      <div
-        class="fixed inset-0 bg-black/50 backdrop-blur-xs z-40 md:hidden transition-opacity"
-        (click)="sidebarService.close()"
-        aria-label="Cerrar panel">
-      </div>
+    <div class="fixed inset-0 bg-black/50 backdrop-blur-xs z-40 md:hidden transition-opacity"
+      (click)="sidebarService.close()" aria-label="Cerrar panel">
+    </div>
     }
 
 

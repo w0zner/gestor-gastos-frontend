@@ -8,25 +8,8 @@ import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { PlantillasFormComponent } from '../plantillas-form-component/plantillas-form-component';
 import { PlantillasService } from '../../services/plantillas-service';
 import { SidebarService } from '../../services/sidebar-service';
-
-
-interface Pago {
-  id?: string;
-  anho: number;
-  mes: number;
-  concepto: string;
-  monto_estimado: number;
-  monto_pagado: number;
-  dia_vencimiento: number;
-  fecha_pago: any;
-  notas: string;
-  estado: string;
-  categoria: string;
-  esFijo: boolean;
-  templateId?: string;
-  fecha_creacion: string;
-  activo: boolean;
-}
+import { Pago } from '../../interfaces/pago';
+import { ToastService } from '../../services/toast-service';
 
 @Component({
   selector: 'app-plantillas-list-component',
@@ -39,7 +22,7 @@ export class PlantillasListComponent {
   private plantillasService = inject(PlantillasService);
   private auth = inject(Auth);
   sidebarService = inject(SidebarService);
-
+  toastService = inject(ToastService);
 
   private readonly coleccion_local = 'plantillas';
   private readonly coleccion_foranea = 'gastos';
@@ -119,26 +102,28 @@ export class PlantillasListComponent {
 
   async manejoGuardado(event: { id?: string; payload: Omit<Pago, 'id'> }) {
     if (event.id) {
-      console.log('Guardando cambios en el pago con ID:', event.id, 'con datos:', event.payload);
-      await this.pagosService.updateDoc(event.id, event.payload, 'plantillas');
+      //console.log('Guardando cambios en el pago con ID:', event.id, 'con datos:', event.payload);
+      const response = await this.pagosService.updateDoc(event.id, event.payload, 'plantillas');
+      this.toastService.showFromResponse(response);
     } else {
-      console.log('Creando nuevo pago con datos:', event.payload);
-      await this.pagosService.createDoc(event.payload, 'plantillas');
+      //console.log('Creando nuevo pago con datos:', event.payload);
+      const response = await this.pagosService.createDoc(event.payload, 'plantillas');
+      this.toastService.showFromResponse(response);
     }
     this.closeModal();
   }
 
   copiar(pago: Pago) {
-    console.log('Copiando plantilla...');
     const mesActual = new Date().getMonth() + 1;
     const anhoActual = new Date().getFullYear();
     const templateId = pago.id;
     this.pagosService.copiarPlantilla(this.coleccion_local, this.coleccion_local, templateId!, mesActual, anhoActual)
-      .then(() => {
-        console.log('Plantilla copiada con éxito');
+      .then((response) => {
+        this.toastService.showFromResponse(response)
       })
       .catch((error) => {
         console.error('Error al copiar la plantilla:', error);
+        this.toastService.error('Error al copiar la plantilla:' + error)
       });
   }
 
@@ -157,17 +142,12 @@ export class PlantillasListComponent {
   }
 
   eliminarPlantilla(pago: Pago) {
-    console.log('Eliminando plantilla con ID:', pago.id);
-    if (!pago.id) {
-      console.error('No se puede eliminar la plantilla: ID no definido.');
-      return;
-    }
-
-    this.pagosService.deleteDoc('plantillas', pago.id)
-      .then(() => {
-        console.log(`Plantilla con ID ${pago.id} eliminada con éxito.`);
+    this.pagosService.deleteDoc(this.coleccion_local, pago.id)
+      .then((response) => {
+        this.toastService.showFromResponse(response);
       })
       .catch((error) => {
+        this.toastService.error('Error al eliminar la plantilla ' + error);
         console.error('Error al eliminar la plantilla:', error);
       });
   }
