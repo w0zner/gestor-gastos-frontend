@@ -3,6 +3,34 @@
 
 <!-- Contenedor principal responsive -->
 <div class="relative p-2 sm:p-4 min-h-[calc(100vh-68px)] bg-base-300">
+
+  @if(toastService.toasts().length > 0){
+    <div class="toast toast-top toast-end z-50">
+    @for (item of toastService.toasts(); track item.id) {
+      <div
+        class="alert shadow-md"
+        [class.alert-info]="item.type === 'info'"
+        [class.alert-success]="item.type === 'success'"
+        [class.alert-warning]="item.type === 'warning'"
+        [class.alert-error]="item.type === 'error'"
+      >
+        <span class="text-white">{{ item.message }}</span>
+        <button
+          type="button"
+          class="btn btn-xs btn-ghost text-white"
+          [class.hover:text-red-400]="item.type === 'error'"
+          [class.hover:text-yellow-400]="item.type === 'warning'"
+          [class.hover:text-green-400]="item.type === 'success'"
+          [class.hover:text-blue-400]="item.type === 'info'"
+          (click)="toastService.dismiss(item.id)"
+        >
+          ✕
+        </button>
+      </div>
+    }
+  </div>
+  }
+
   <div class="grid grid-cols-12 gap-4">
 
         <!-- Panel lateral (Drawer en mobile, columna fija en desktop) -->

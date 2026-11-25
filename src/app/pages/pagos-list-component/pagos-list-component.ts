@@ -8,6 +8,7 @@ import { collectionData } from '@angular/fire/firestore';
 import { forkJoin } from 'rxjs';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { SidebarService } from '../../services/sidebar-service';
+import { ToastService } from '../../services/toast-service';
 
 interface Pago {
   id?: string;
@@ -38,6 +39,7 @@ export class PagosListComponent {
   private router = inject(Router);
   private auth = inject(Auth);
   sidebarService = inject(SidebarService);
+  toastService = inject(ToastService);
 
   private readonly coleccion_local = 'gastos';
   private readonly coleccion_foranea = 'plantillas';
@@ -159,8 +161,8 @@ export class PagosListComponent {
 
   inicializarMesGastos() {
     this.pagosService.inicializarMesGastos()
-      .then(() => {
-        console.log('Plantilla copiada con éxito');
+      .then((response) => {
+        this.toastService.error('Los gastos fijos de este mes ya fueron inicializados.');
       })
       .catch((error) => {
         console.error('Error al copiar la plantilla:', error);

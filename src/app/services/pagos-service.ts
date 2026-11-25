@@ -4,6 +4,7 @@ import { Auth, user } from '@angular/fire/auth';
 import { collectionData, Firestore } from '@angular/fire/firestore';
 import { addDoc, collection, deleteDoc, doc, getDoc, getDocs, orderBy, query, serverTimestamp, updateDoc, where, writeBatch } from 'firebase/firestore';
 import { Observable, of, switchMap } from 'rxjs';
+import { ToastService } from './toast-service';
 
 @Injectable({
   providedIn: 'root',
@@ -11,6 +12,7 @@ import { Observable, of, switchMap } from 'rxjs';
 export class PagosService {
   private firestore = inject(Firestore);
   private auth = inject(Auth);
+  toastService=inject(ToastService);
 
   private readonly coleccion_local = 'gastos';
   private readonly coleccion_foranea = 'plantillas';
@@ -102,7 +104,7 @@ export class PagosService {
   }
 
 
-  async inicializarMesGastos() {
+  async inicializarMesGastos(): Promise<string> {
     const mesActual = new Date().getMonth() + 1;
     const anhoActual = new Date().getFullYear();
     const expensesRef = collection(this.firestore, `users/${this.usuario()?.uid}/gastos`);
@@ -116,15 +118,17 @@ export class PagosService {
     const existingSnap = await getDocs(q);
 
     if (!existingSnap.empty) {
-      console.log('Los gastos fijos de este mes ya fueron inicializados.');
-      return;
+      //console.log('Los gastos fijos de este mes ya fueron inicializados.');
+      //this.toastService.error('Los gastos fijos de este mes ya fueron inicializados.');
+      const mensaje = 'Los gastos fijos de este mes ya fueron inicializados.';
+      return mensaje;
     }
 
     // 2. Obtener las plantillas activas
     const templatesRef = collection(this.firestore, `users/${this.usuario()?.uid}/plantillas`);
     const templatesSnap = await getDocs(query(templatesRef, where('activo', '==', true)));
 
-    if (templatesSnap.empty) return;
+    if (templatesSnap.empty) return 'No hay plantillas activas para inicializar.';
 
     // 3. Crear las instancias usando un batch para eficiencia atómica
     const batch = writeBatch(this.firestore);
@@ -144,6 +148,7 @@ export class PagosService {
 
     await batch.commit();
     console.log('Gastos fijos del mes inicializados con éxito.');
+    return 'Gastos fijos del mes inicializados con éxito.';
   }
 
   //Copia Documento exactamente igual
