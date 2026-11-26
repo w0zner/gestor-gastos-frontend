@@ -2,8 +2,9 @@ import { inject, Injectable } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { Auth, user } from '@angular/fire/auth';
 import { collectionData, Firestore } from '@angular/fire/firestore';
-import { addDoc, collection, orderBy, query, serverTimestamp, where } from 'firebase/firestore';
+import { addDoc, collection, doc, orderBy, query, serverTimestamp, updateDoc, where } from 'firebase/firestore';
 import { Observable, of, switchMap } from 'rxjs';
+import { buildResponse, OperationResponse, TypeResponse } from '../interfaces/operation-response';
 
 @Injectable({
   providedIn: 'root',
@@ -56,5 +57,20 @@ export class PlantillasService {
       activo: true,
       fecha_creacion: serverTimestamp()
     });
+  }
+
+  async actualizarActivo(plantillaId: string, activo: boolean): Promise<OperationResponse> {
+    const uid = this.usuario()?.uid;
+    if (!uid) {
+      return buildResponse(TypeResponse.ERROR, 'No hay un usuario autenticado.');
+    }
+
+    const plantillaRef = doc(this.firestore, `users/${uid}/${this.coleccion_local}/${plantillaId}`);
+    await updateDoc(plantillaRef, { activo });
+
+    return buildResponse(
+      TypeResponse.OK,
+      activo ? 'Plantilla activada con éxito.' : 'Plantilla desactivada con éxito.'
+    );
   }
 }

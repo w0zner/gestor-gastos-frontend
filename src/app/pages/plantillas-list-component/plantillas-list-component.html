@@ -42,7 +42,7 @@
             </thead>
             <tbody>
                 @for (pago of pagos(); track pago.id) {
-                <tr [style.background-color]="pago.activo === false ? '#cccccc' : pago.colorEstado">
+                <tr [class]="pago.activo === false ? 'text-zinc-400' : ''">
                     <!-- <td>{{pago.id}}</td> -->
                     <td><b>{{pago.concepto}}</b></td>
                     <td>{{pago.dia_vencimiento}}</td>
@@ -57,12 +57,24 @@
                             {{pago.nombreEstado}}
                         </div>
                     </td>
-                    <td>{{pago.activo}}</td>
+                    <td>
+                      <label class="swap">
+                        <input type="checkbox" [checked]="pago.activo" (change)="cambiarActivo(pago, $event)" />
+
+                        <svg class="swap-on fill-current w-7 h-7" xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="100" height="100" viewBox="0 0 48 48">
+                        <linearGradient id="5zzMGVQnN_QyRYWGmJUsQa_A8xKzsTKHhzn_gr1" x1="9.858" x2="38.142" y1="9.858" y2="38.142" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#21ad64"></stop><stop offset="1" stop-color="#088242"></stop></linearGradient><path fill="url(#5zzMGVQnN_QyRYWGmJUsQa_A8xKzsTKHhzn_gr1)" d="M44,24c0,11.045-8.955,20-20,20S4,35.045,4,24S12.955,4,24,4S44,12.955,44,24z"></path><path d="M32.172,16.172L22,26.344l-5.172-5.172c-0.781-0.781-2.047-0.781-2.828,0l-1.414,1.414	c-0.781,0.781-0.781,2.047,0,2.828l8,8c0.781,0.781,2.047,0.781,2.828,0l13-13c0.781-0.781,0.781-2.047,0-2.828L35,16.172	C34.219,15.391,32.953,15.391,32.172,16.172z" opacity=".05"></path><path d="M20.939,33.061l-8-8c-0.586-0.586-0.586-1.536,0-2.121l1.414-1.414c0.586-0.586,1.536-0.586,2.121,0	L22,27.051l10.525-10.525c0.586-0.586,1.536-0.586,2.121,0l1.414,1.414c0.586,0.586,0.586,1.536,0,2.121l-13,13	C22.475,33.646,21.525,33.646,20.939,33.061z" opacity=".07"></path><path fill="#fff" d="M21.293,32.707l-8-8c-0.391-0.391-0.391-1.024,0-1.414l1.414-1.414c0.391-0.391,1.024-0.391,1.414,0	L22,27.758l10.879-10.879c0.391-0.391,1.024-0.391,1.414,0l1.414,1.414c0.391,0.391,0.391,1.024,0,1.414l-13,13	C22.317,33.098,21.683,33.098,21.293,32.707z"></path>
+                        </svg>
+
+                        <svg class="swap-off fill-current w-7 h-7" xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="100" height="100" viewBox="0 0 48 48">
+                        <linearGradient id="9xVvr7yCTUSTEWJ7qqwo6a_2xlEjUnUxAg1_gr1" x1="1.956" x2="54.829" y1="1.956" y2="54.829" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#262626" stop-opacity="0"></stop><stop offset="1" stop-color="#262626" stop-opacity=".8"></stop></linearGradient><circle cx="24" cy="24" r="20" fill="url(#9xVvr7yCTUSTEWJ7qqwo6a_2xlEjUnUxAg1_gr1)"></circle><linearGradient id="9xVvr7yCTUSTEWJ7qqwo6b_2xlEjUnUxAg1_gr2" x1="740.406" x2="787.897" y1="-1145.624" y2="-1158.349" gradientTransform="translate(-743.775 1175.631)" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#262626" stop-opacity="0"></stop><stop offset="1" stop-color="#262626" stop-opacity=".8"></stop></linearGradient><polygon fill="url(#9xVvr7yCTUSTEWJ7qqwo6b_2xlEjUnUxAg1_gr2)" points="33.192,19.05 19.05,33.192 14.808,28.95 19.757,24 14.808,19.05 19.05,14.808 24,19.757 28.95,14.808"></polygon><linearGradient id="9xVvr7yCTUSTEWJ7qqwo6c_2xlEjUnUxAg1_gr3" x1="778.531" x2="767.699" y1="-1138.238" y2="-1153.707" gradientTransform="translate(-743.775 1175.631)" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#262626" stop-opacity="0"></stop><stop offset="1" stop-color="#262626" stop-opacity=".8"></stop></linearGradient><polygon fill="url(#9xVvr7yCTUSTEWJ7qqwo6c_2xlEjUnUxAg1_gr3)" points="33.192,28.95 28.95,33.192 24,28.243 28.243,24"></polygon>
+                        </svg>
+                      </label>
+                    </td>
                     <td>
                         <div class="flex space-x-1">
                             <div class="lg:tooltip" data-tip="Enviar a Lista de pagos">
-                                <button class="btn btn-ghost" (click)="copiarToPagos(pago)">
-                                    <i class="fi fi-rr-paper-plane"></i>
+                                <button class="btn btn-ghost" (click)="copiarToPagos(pago)" [disabled]="pago.activo===false">
+                                    <i class="fi fi-rr-paper-plane" ></i>
                                 </button>
                             </div>
 

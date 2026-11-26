@@ -9,6 +9,7 @@ import { PlantillasFormComponent } from '../plantillas-form-component/plantillas
 import { PlantillasService } from '../../services/plantillas-service';
 import { SidebarService } from '../../services/sidebar-service';
 import { Pago } from '../../interfaces/pago';
+import { TypeResponse } from '../../interfaces/operation-response';
 import { ToastService } from '../../services/toast-service';
 
 @Component({
@@ -139,6 +140,25 @@ export class PlantillasListComponent {
       .catch((error) => {
         console.error('Error al copiar la plantilla:', error);
       });
+  }
+
+  async cambiarActivo(pago: Pago, event: Event) {
+    const input = event.target as HTMLInputElement;
+    const nuevoActivo = input.checked;
+
+    if (!pago.id) return;
+
+    try {
+      const response = await this.plantillasService.actualizarActivo(pago.id, nuevoActivo);
+      if (response.type !== TypeResponse.OK) {
+        input.checked = !nuevoActivo;
+      }
+      this.toastService.showFromResponse(response);
+    } catch (error) {
+      input.checked = !nuevoActivo;
+      console.error('Error al actualizar el estado activo:', error);
+      this.toastService.error('Error al actualizar el estado activo: ' + error);
+    }
   }
 
   eliminarPlantilla(pago: Pago) {
