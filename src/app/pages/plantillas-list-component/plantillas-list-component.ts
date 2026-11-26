@@ -11,12 +11,13 @@ import { SidebarService } from '../../services/sidebar-service';
 import { Pago } from '../../interfaces/pago';
 import { TypeResponse } from '../../interfaces/operation-response';
 import { ToastService } from '../../services/toast-service';
+import { ConfirmationModalComponent } from '../confirmation-modal-component/confirmation-modal-component';
 
 @Component({
   selector: 'app-plantillas-list-component',
   templateUrl: './plantillas-list-component.html',
   styleUrl: './plantillas-list-component.css',
-  imports: [DatePipe, ReactiveFormsModule, CurrencyPipe, PlantillasFormComponent]
+  imports: [DatePipe, ReactiveFormsModule, CurrencyPipe, PlantillasFormComponent, ConfirmationModalComponent]
 })
 export class PlantillasListComponent {
   private pagosService = inject(PagosService);
@@ -32,6 +33,9 @@ export class PlantillasListComponent {
 
   isModalOpen = signal(false);
   selectedExpense = signal<Pago | null>(null);
+
+  isConfirmationModalOpen = signal(false);
+  selectedObject = signal<any | null>(null);
 
   listaPagos = signal<Pago[]>([]);
 
@@ -99,6 +103,21 @@ export class PlantillasListComponent {
     console.log('Cerrando modal...');
     this.isModalOpen.set(false);
     this.selectedExpense.set(null);
+  }
+
+  pedirConfirmacion(registro: Pago) {
+    this.selectedObject.set(registro);
+    this.isConfirmationModalOpen.set(true);
+  }
+
+  onConfirmDelete(confirmed: boolean) {
+    this.isConfirmationModalOpen.set(false);
+    const object = this.selectedObject();
+    this.selectedObject.set(null);
+
+    if (!confirmed || object === null) return;
+
+    this.eliminarPlantilla(object);
   }
 
   async manejoGuardado(event: { id?: string; payload: Omit<Pago, 'id'> }) {
