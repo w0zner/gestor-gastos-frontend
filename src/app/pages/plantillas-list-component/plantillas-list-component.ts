@@ -9,7 +9,7 @@ import { PlantillasFormComponent } from '../plantillas-form-component/plantillas
 import { PlantillasService } from '../../services/plantillas-service';
 import { SidebarService } from '../../services/sidebar-service';
 import { Pago } from '../../interfaces/pago';
-import { TypeResponse } from '../../interfaces/operation-response';
+import { buildResponse, TypeResponse } from '../../interfaces/operation-response';
 import { ToastService } from '../../services/toast-service';
 import { ConfirmationModalComponent } from '../confirmation-modal-component/confirmation-modal-component';
 
@@ -37,8 +37,10 @@ export class PlantillasListComponent {
   isConfirmationModalOpen = signal(false);
   selectedObject = signal<any | null>(null);
 
-  listaPagos = signal<Pago[]>([]);
+  mesActual = new Date().getMonth() + 1;
+  anhoActual = new Date().getFullYear();
 
+  pagosRaw = toSignal(this.pagosService.getPagosDelUsuario(this.mesActual, this.anhoActual), { initialValue: [] });
   plantillasRaw = toSignal(this.plantillasService.obtenerPlantillas(true), { initialValue: [] });
   categorias = toSignal(this.pagosService.getCategorias(), { initialValue: [] });
   estados = toSignal(this.pagosService.getEstados(), { initialValue: [] });
@@ -147,11 +149,26 @@ export class PlantillasListComponent {
       });
   }
 
+  existeConcepto(concepto: string,mesActual: number, anhoActual: number) {
+console.log("Buscando concepto ssdf")
+    if (!this.pagosRaw().length) return [];
+
+    const buscaConcepto = this.pagosRaw().find((item) => item.concepto === concepto);
+    console.log("Buscando concepto " + buscaConcepto)
+
+    return buscaConcepto ? true : false;
+  }
+
   copiarToPagos(pago: Pago) {
     console.log('Copiando registro de pago...');
     const mesActual = new Date().getMonth() + 1;
     const anhoActual = new Date().getFullYear();
     const templateId = pago.id;
+
+    if (this.existeConcepto(pago.concepto, mesActual, anhoActual)) {
+        return this.toastService.showFromResponse(buildResponse(TypeResponse.WARNING, `El concepto "${pago.concepto}" ya existe en la lista de pagos de este mes.`));
+    }
+
     this.pagosService.copiarPlantilla(this.coleccion_local, this.coleccion_foranea, templateId!, mesActual, anhoActual)
       .then(() => {
         console.log('Plantilla copiada con éxito');

@@ -52,11 +52,10 @@ export class PagosService {
     );
   }
 
-  getPagos(): Observable<any[]> {
-    //console.log('Usuario actual:', this.usuario());
-    let usuario = 0
-    return collectionData(query(this.pagosCollection, where('user_id', '==', usuario)), { idField: 'id' }) as Observable<any[]>
-  }
+  // getPagos(): Observable<any[]> {
+  //   let usuario = 0
+  //   return collectionData(query(this.pagosCollection, where('user_id', '==', usuario)), { idField: 'id' }) as Observable<any[]>
+  // }
 
   getCategorias(): Observable<any[]> {
     return collectionData(this.categoriaCollection, { idField: 'id' }) as Observable<any[]>

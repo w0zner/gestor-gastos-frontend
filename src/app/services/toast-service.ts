@@ -29,10 +29,10 @@ export class ToastService {
         this.error(response.message);
         break;
       case TypeResponse.WARNING:
-        this.error(response.message);
+        this.warning(response.message);
         break;
       case TypeResponse.INFO:
-        this.error(response.message);
+        this.info(response.message);
         break;
     }
   }
@@ -53,6 +53,10 @@ export class ToastService {
 
   warning(message: string, duration: number = 3000) {
     this.show(message, 'warning', duration);
+  }
+
+  info(message: string, duration: number = 3000) {
+    this.show(message, 'info', duration);
   }
 
   dismiss(id: number) {
