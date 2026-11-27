@@ -22,7 +22,7 @@ jobs:
           cat << 'EOF' > src/environments/environment.ts
           export const environment = {
             production: true,
-            firebase: {
+            firebaseConfig: {
               apiKey: "${{ secrets.FIREBASE_API_KEY }}",
               authDomain: "${{ secrets.FIREBASE_AUTH_DOMAIN }}",
               projectId: "gestor-gastos-da1f8",
