@@ -88,11 +88,13 @@ export class PagosListComponent {
     return listaEstados
       .map((estado: any) => {
         const cantidad = listaPagos.filter(p => p.nombreEstado === estado.nombre || p.estado?.id === estado.id).length;
+        const suma = listaPagos.filter(pago => pago.nombreEstado === estado.nombre || pago.estado?.id === estado.id).reduce((acc, pago) => acc + (pago.monto_estimado || 0), 0);
         return {
           id: estado.id,
           nombre: estado.nombre,
           color: estado.color,
-          cantidad
+          cantidad,
+          suma
         };
       })
       .sort((a, b) => {
