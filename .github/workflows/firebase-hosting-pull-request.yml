@@ -15,7 +15,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: '20' # cámbialo si usas otra versión LTS de Node
+          node-version: '24' # cámbialo si usas otra versión LTS de Node
           cache: 'npm'
       - run: npm ci
       - name: Create environment file
